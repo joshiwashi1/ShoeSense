@@ -1,10 +1,9 @@
-package com.shoesense.shoesense.Presenter
+package com.shoesense.shoesense.register
 
 import android.util.Patterns
 import com.shoesense.shoesense.Model.AuthRepository
-import com.shoesense.shoesense.RegisterActivity
 
-class RegistrationPresenter(private val view: RegisterActivity) {
+class RegistrationPresenter(private val view: RegisterView) {
 
     private val authRepository = AuthRepository
 
@@ -37,4 +36,3 @@ class RegistrationPresenter(private val view: RegisterActivity) {
         }
     }
 }
-

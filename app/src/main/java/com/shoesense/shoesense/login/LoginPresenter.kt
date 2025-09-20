@@ -1,10 +1,9 @@
-package com.shoesense.shoesense.Presenter
+package com.shoesense.shoesense.login
 
 import android.util.Patterns
-import com.shoesense.shoesense.LoginActivity
 import com.shoesense.shoesense.Model.AuthRepository
 
-class LoginPresenter(private val view: LoginActivity) {
+class LoginPresenter(private val view: LoginView) {
 
     private val authRepository = AuthRepository
 
@@ -37,4 +36,3 @@ class LoginPresenter(private val view: LoginActivity) {
         view.fillUserData(email, password)
     }
 }
-

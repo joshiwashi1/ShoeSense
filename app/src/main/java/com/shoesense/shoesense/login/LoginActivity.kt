@@ -1,4 +1,4 @@
-package com.shoesense.shoesense
+package com.shoesense.shoesense.login
 
 import android.app.Activity
 import android.content.Intent
@@ -7,13 +7,17 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.shoesense.shoesense.Presenter.LoginPresenter
+import com.shoesense.shoesense.HomeDashboard
+import com.shoesense.shoesense.R
+import com.shoesense.shoesense.forgotpassword.ForgotPasswordActivity
+import com.shoesense.shoesense.register.RegisterActivity
 
-class LoginActivity : Activity() {
+class LoginActivity : Activity(), LoginView {
 
     private lateinit var loginEmail: EditText
     private lateinit var loginPassword: EditText
     private lateinit var presenter: LoginPresenter
+    private lateinit var forgotPasswordText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +27,9 @@ class LoginActivity : Activity() {
         loginPassword = findViewById(R.id.password_edit_text)
         val loginBtn = findViewById<Button>(R.id.login_Button)
         val registerText = findViewById<TextView>(R.id.register_here)
+        forgotPasswordText = findViewById(R.id.forgot_password)
 
         presenter = LoginPresenter(this)
-
 
         loginBtn.setOnClickListener {
             val email = loginEmail.text.toString().trim()
@@ -37,26 +41,30 @@ class LoginActivity : Activity() {
             Toast.makeText(this, "Opening Register Page", Toast.LENGTH_LONG).show()
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+        forgotPasswordText.setOnClickListener {
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
     }
 
-    fun showEmailError(msg: String) {
+    override fun showEmailError(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    fun showPasswordError(msg: String) {
+    override fun showPasswordError(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    fun showLoginSuccess() {
+    override fun showLoginSuccess() {
         Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
     }
 
-    fun navigateToDashboard() {
+    override fun navigateToDashboard() {
         startActivity(Intent(this, HomeDashboard::class.java))
         finish()
     }
 
-    fun fillUserData(email: String, password: String) {
+    override fun fillUserData(email: String, password: String) {
         loginEmail.setText(email)
         loginPassword.setText(password)
     }

@@ -1,12 +1,13 @@
-package com.shoesense.shoesense
+package com.shoesense.shoesense.register
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
-import com.shoesense.shoesense.Presenter.RegistrationPresenter
+import com.shoesense.shoesense.R
+import com.shoesense.shoesense.login.LoginActivity
 
-class RegisterActivity : Activity() {
+class RegisterActivity : Activity(), RegisterView {
 
     private lateinit var nameEditText: EditText
     private lateinit var emailEditText: EditText
@@ -28,6 +29,7 @@ class RegisterActivity : Activity() {
         loginTextView = findViewById(R.id.loginTextview)
         signupButton = findViewById(R.id.signUpButton)
 
+
         // Initialize presenter
         presenter = RegistrationPresenter(this)
 
@@ -48,12 +50,12 @@ class RegisterActivity : Activity() {
         }
     }
 
-    // Presenter callbacks
-    fun showError(message: String) {
+    // ===== Implementing RegisterView Interface =====
+    override fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun showSuccess(message: String) {
+    override fun showSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
