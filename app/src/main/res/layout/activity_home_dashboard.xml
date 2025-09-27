@@ -5,14 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFD428"
-    tools:context=".HomeDashboard">
+    tools:context=".home.HomeDashboard">
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#000000"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="12dp"
@@ -26,7 +25,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_sort_by_size"
-            android:tint="@android:color/white"
+            app:tint="@android:color/black"
             android:contentDescription="Menu" />
 
         <!-- Page Title -->
@@ -37,18 +36,17 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Home"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:textSize="50sp"
             android:textStyle="bold" />
 
         <!-- Profile Picture -->
         <ImageView
             android:id="@+id/imgProfile"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/profile_icon"
             android:scaleType="centerCrop"
-
             android:contentDescription="Profile" />
     </LinearLayout>
 
@@ -66,189 +64,33 @@
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Grid of Slots -->
-    <GridLayout
-        android:id="@+id/gridSlots"
+    <!-- RecyclerView for Slots -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/slotRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:columnCount="2"
-        android:rowCount="3"
-        android:alignmentMode="alignMargins"
-        android:useDefaultMargins="true"
-        android:padding="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Slot 1 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@android:color/white"
-            android:elevation="4dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Slot 1"
-                android:textStyle="bold"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="4dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@android:drawable/checkbox_on_background"
-
-                    android:contentDescription="Status Icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Occupied"
-                    android:textColor="@android:color/holo_green_dark"
-                    android:textSize="14sp"
-                    android:layout_marginStart="6dp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last Updated: 10:30 AM"
-                android:textSize="12sp"
-                android:textColor="#666"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@android:color/white"
-            android:elevation="4dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Slot 2"
-                android:textStyle="bold"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="4dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@android:drawable/ic_delete"
-                    app:tint="@android:color/holo_red_dark"
-                    android:contentDescription="Status Icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Empty"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:textSize="14sp"
-                    android:layout_marginStart="6dp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last Updated: 9:45 AM"
-                android:textSize="12sp"
-                android:textColor="#666"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <!-- Slot 3 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@android:color/white"
-            android:elevation="4dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Slot"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@android:color/black" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="4dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@android:drawable/ic_input_add"
-                    app:tint="@android:color/holo_blue_dark"
-                    android:contentDescription="Add Icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tap to add"
-                    android:textColor="@android:color/holo_blue_dark"
-                    android:textSize="14sp"
-                    android:layout_marginStart="6dp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last Updated: --"
-                android:textSize="12sp"
-                android:textColor="#666"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-
-    </GridLayout>
-
-
+    <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="16dp"
         android:background="#2196F3"
         android:elevation="8dp"
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
         android:paddingVertical="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Home -->
         <LinearLayout
@@ -262,9 +104,6 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/home_icon" />
-
-
-
         </LinearLayout>
 
         <!-- Analytics -->
@@ -279,12 +118,9 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/history_icon" />
-
-
-
         </LinearLayout>
 
-        <!-- Yield -->
+        <!-- Notifications -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -296,9 +132,6 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/notif_icon" />
-
-
-
         </LinearLayout>
 
         <!-- Settings -->
@@ -313,10 +146,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/settings_icon" />
-
-
         </LinearLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

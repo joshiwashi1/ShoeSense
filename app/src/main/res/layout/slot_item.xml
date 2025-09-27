@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@android:color/white"
+    android:elevation="4dp"
+    android:layout_margin="8dp">
+
+    <!-- Slot Title -->
+    <TextView
+        android:id="@+id/slotTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Slot 1"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black" />
+
+    <!-- Status Row -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/statusIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/checkbox_on_background"
+            app:tint="@android:color/holo_green_dark" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Occupied"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <!-- Last Updated -->
+    <TextView
+        android:id="@+id/lastUpdated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last Updated: 10:30 AM"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
+

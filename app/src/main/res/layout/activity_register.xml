@@ -1,121 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12sp"
+    android:fillViewport="true"
+    android:padding="24dp"
     tools:context=".register.RegisterActivity">
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:textSize="48dp"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:layout_marginTop="75sp">
-    </TextView>
-
-
-
-    <TextView
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:layout_marginTop="50dp"
-        android:textSize="18sp"
-        android:text="Name:">
-    </TextView>
-    <EditText
-        android:id="@+id/NameEditText"
-        android:layout_gravity="center"
-        android:layout_width="350dp"
-        android:layout_height="40dp"
-        android:textSize="18sp">
-    </EditText>
-    <TextView
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:text="Email:">
-    </TextView>
-    <EditText
-        android:id="@+id/emailEditText"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_width="350dp"
-        android:layout_height="40dp"
-        android:textSize="18sp"/>
-    <TextView
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:text="Password"/>
-    <EditText
-        android:id="@+id/passwordEditText"
-        android:inputType="textPassword"
-        android:layout_gravity="center"
-        android:layout_width="350dp"
-        android:layout_height="40dp"
-        android:textSize="18sp"
-        android:hint="Password"/>
-    <TextView
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:text="Confirm Password"/>
-    <EditText
-        android:id="@+id/confirmPasswordEditText"
-        android:inputType="textPassword"
-        android:layout_gravity="center"
-        android:layout_width="350dp"
-        android:layout_height="40dp"
-        android:textSize="18sp"
-        android:hint="Confirm Password"/>
-    <Button
-        android:layout_marginTop="50dp"
-        android:id="@+id/signUpButton"
-        android:layout_gravity="center"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Sign up"
-        android:backgroundTint="@color/blue"
-        android:layout_marginEnd="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:layout_gravity="center"
-        android:gravity="center">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Account"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Sub Text -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Already have an account?  "
-            android:textSize="18sp" />
+            android:layout_gravity="center"
+            android:text="Complete the fields below, or click login here if you’ve registered before"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
 
+        <!-- Section Intro -->
         <TextView
-            android:id="@+id/loginTextview"
-            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Let's get started!"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Name -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp" />
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Enter your name"
+            android:textSize="16sp"
+            android:background="@drawable/createaccountedittext_border"
+            android:padding="12dp" />
+
+        <!-- Email -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp" />
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Enter your email"
+            android:textSize="16sp"
+            android:background="@drawable/createaccountedittext_border"
+            android:inputType="textEmailAddress"
+            android:padding="12dp" />
+
+        <!-- Password -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Password:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp" />
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Enter your password"
+            android:inputType="textPassword"
+            android:textSize="16sp"
+            android:background="@drawable/createaccountedittext_border"
+            android:padding="12dp" />
+
+        <!-- Confirm Password -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Confirm Password:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp" />
+        <EditText
+            android:id="@+id/confirmPasswordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Confirm your password"
+            android:inputType="textPassword"
+            android:textSize="16sp"
+            android:background="@drawable/createaccountedittext_border"
+            android:padding="12dp" />
+
+        <!-- Terms and Conditions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="By tapping Sign up, you agree with the"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/loginTextview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Terms and Conditions and Privacy Policy"
+                android:textColor="@color/red"
+                android:textSize="10sp"
+                android:clickable="true" />
+        </LinearLayout>
+
+        <!-- Sign Up Button -->
+        <Button
+            android:id="@+id/signUpButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:text="Sign Up"
+            android:background="@drawable/button_border"
+            android:backgroundTint="@color/yellow" />
+
+        <!-- Already have account -->
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="21dp"
-            android:text="Log in"
-            android:textColor="@color/red"
-            android:textSize="18sp" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:text="Already have an account?"
+            android:textSize="14sp" />
+
+        <!-- Login Button -->
+        <Button
+            android:id="@+id/loginhereButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Login Here"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_border" />
+
     </LinearLayout>
-
-
-
-
-</LinearLayout>
+</ScrollView>
