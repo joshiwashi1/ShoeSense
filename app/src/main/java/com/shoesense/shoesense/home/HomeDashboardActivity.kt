@@ -8,7 +8,7 @@ import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Model.Slot
 import com.shoesense.shoesense.adapter.SlotAdapter
 
-class HomeDashboard : AppCompatActivity() {
+class HomeDashboardActivity : AppCompatActivity() {
 
     private lateinit var slotRecyclerView: RecyclerView
     private lateinit var slotAdapter: SlotAdapter

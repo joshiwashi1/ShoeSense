@@ -13,6 +13,15 @@
         android:theme="@style/Theme.ShoeSense"
         tools:targetApi="31">
         <activity
+            android:name=".AddSlot.AddSlotActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditThreshold.EditThresholdActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SlotDetail.SlotDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".settings.SettingsActivity"
             android:exported="false" />
         <activity
@@ -34,7 +43,7 @@
             android:name=".login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".home.HomeDashboard"
+            android:name=".home.HomeDashboardActivity"
             android:exported="false" />
         <activity
             android:name=".welcome.WelcomeActivity"

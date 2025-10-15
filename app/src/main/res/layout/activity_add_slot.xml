@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6C623"
+    tools:context=".AddSlot.AddSlotActivity">
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:adjustViewBounds="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/tvTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.044"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/button_back"
+        app:tint="@android:color/black" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:gravity="center"
+        android:text="Add Slot"
+        android:textColor="@android:color/black"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAdd"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardUseCompatPadding="true"
+        app:cardCornerRadius="12dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#1D4ED8"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:gravity="center_horizontal">
+
+            <!-- Slot label -->
+            <TextView
+                android:id="@+id/tvSlotLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Slot 6"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Add name button (looks like your mock) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddSlotName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Add Slot Name"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:textSize="25sp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="@color/blue_main"
+                android:layout_marginBottom="14dp"/>
+
+            <!-- Threshold label -->
+            <TextView
+                android:id="@+id/tvSetThreshold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set Threshold"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Slider (kept XML-simple for maximum compatibility) -->
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderThreshold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="18dp"
+                app:thumbColor="#2563EB"
+                app:haloColor="#60A5FA"
+                app:trackColorActive="#2563EB"
+                app:trackColorInactive="#BFDBFE"
+                app:tickColorActive="#93C5FD"
+                app:tickColorInactive="#BFDBFE" />
+
+            <!-- Current value -->
+            <TextView
+                android:id="@+id/tvThresholdValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 kg"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Add Slot -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddSlot"
+                android:layout_width="160dp"
+                android:layout_height="44dp"
+                android:text="Add Slot"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                app:cornerRadius="16dp"
+                app:backgroundTint="@color/blue_main"
+                android:layout_marginTop="6dp"/>
+
+            <!-- Cancel -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                android:layout_width="160dp"
+                android:layout_height="44dp"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                app:cornerRadius="16dp"
+                app:backgroundTint="#EF4444"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="4dp"/>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

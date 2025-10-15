@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.shoesense.shoesense.home.HomeDashboard
+import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.forgotpassword.ForgotPasswordActivity
 import com.shoesense.shoesense.register.RegisterActivity
@@ -60,7 +60,7 @@ class LoginActivity : Activity(), LoginView {
     }
 
     override fun navigateToDashboard() {
-        startActivity(Intent(this, HomeDashboard::class.java))
+        startActivity(Intent(this, HomeDashboardActivity::class.java))
         finish()
     }
 
