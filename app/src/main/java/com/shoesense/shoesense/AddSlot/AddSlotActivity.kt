@@ -96,4 +96,8 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
     override fun closeScreen() {
         finish()
     }
+    override fun onSaved() {
+        setResult(AddSlotActivity.RESULT_SAVED)
+    }
+
 }

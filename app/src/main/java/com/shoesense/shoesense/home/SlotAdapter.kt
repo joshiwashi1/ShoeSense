@@ -77,18 +77,29 @@ class SlotAdapter(
 
         fun bind(s: Slot, onClick: (Slot) -> Unit) {
             tvTitle.text = s.name
+
             if (s.occupied) {
                 tvStatus.text = "Occupied"
-                imgStatus.setImageResource(R.drawable.ic_check_green)
+                setImageOrFallback(imgStatus, R.drawable.ic_check_green, android.R.drawable.presence_online)
             } else {
                 tvStatus.text = "Empty"
-                imgStatus.setImageResource(R.drawable.ic_close_red) // ensure this exists
+                setImageOrFallback(imgStatus, R.drawable.ic_close_red, android.R.drawable.presence_busy)
             }
+
             tvUpdated.text = "Last Updated:\n${formatTime(s.lastUpdated)}"
             itemView.setOnClickListener { onClick(s) }
         }
 
-        private fun formatTime(raw: String): String {
+        private fun setImageOrFallback(view: ImageView, primaryRes: Int, fallbackRes: Int) {
+            try {
+                view.setImageResource(primaryRes)
+            } catch (_: Exception) {
+                view.setImageResource(fallbackRes)
+            }
+        }
+
+        private fun formatTime(raw: String?): String {
+            if (raw.isNullOrBlank()) return "—"
             val inFormats = listOf(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'",
                 "yyyy-MM-dd'T'HH:mm:ss",
@@ -98,11 +109,15 @@ class SlotAdapter(
             for (p in inFormats) {
                 try {
                     val df = SimpleDateFormat(p, Locale.getDefault())
+                    // If you store UTC with 'Z', parse in UTC to avoid local shift
+                    if (p.endsWith("'Z'")) {
+                        df.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                    }
                     val d = df.parse(raw)
                     if (d != null) return out.format(d)
                 } catch (_: Exception) {}
             }
-            return raw
+            return raw // fallback to the raw string if parsing failed
         }
     }
 }

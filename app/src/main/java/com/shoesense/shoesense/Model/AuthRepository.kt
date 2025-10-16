@@ -15,4 +15,3 @@ object AuthRepository {
         return users.any { it.email == email && it.password == password }
     }
 }
-

@@ -1,7 +1,7 @@
-// app/src/main/java/com/shoesense/shoesense/EditThreshold/EditThresholdActivity.kt
 package com.shoesense.shoesense.EditThreshold
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
@@ -15,8 +15,9 @@ class EditThresholdActivity : AppCompatActivity(), EditThresholdView {
 
     companion object {
         const val EXTRA_SLOT_NAME = "extra_slot_name"
-        const val EXTRA_THRESHOLD_G = "extra_threshold_g"   // incoming
-        const val RESULT_THRESHOLD_G = "result_threshold_g" // outgoing
+        const val EXTRA_SLOT_ID = "extra_slot_id"
+        const val EXTRA_THRESHOLD_G = "extra_threshold_g"
+        const val RESULT_THRESHOLD_G = "result_threshold_g"
     }
 
     private lateinit var presenter: EditThresholdPresenter
@@ -39,42 +40,61 @@ class EditThresholdActivity : AppCompatActivity(), EditThresholdView {
         btnCancel = findViewById(R.id.btnCancel)
         btnBack = findViewById(R.id.btnBack)
 
-        presenter = EditThresholdPresenter(this)
+        val slotId = intent.getStringExtra(EXTRA_SLOT_ID) ?: ""
+        val slotName = intent.getStringExtra(EXTRA_SLOT_NAME) ?: "Slot"
+        val currentG = intent.getIntExtra(EXTRA_THRESHOLD_G, 500)
 
-        // Configure slider FIRST (range + step)
+        if (slotId.isBlank()) {
+            Toast.makeText(this, "Missing slot ID", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        presenter = EditThresholdPresenter(this, slotId)
+
+        // --- Configure slider ---
         slider.valueFrom = presenter.minG()
         slider.valueTo = presenter.maxG()
         slider.stepSize = presenter.stepG()
 
-        // Init presenter with incoming extras
-        val slotName = intent.getStringExtra(EXTRA_SLOT_NAME)
-        val currentG = intent.getIntExtra(EXTRA_THRESHOLD_G, 500)
-        presenter.onInit(slotName, currentG)
+        val min = presenter.minG().toInt()
+        val max = presenter.maxG().toInt()
+        val step = presenter.stepG().toInt()
+        val clamped = currentG.coerceIn(min, max)
+        val snapped = ((clamped + step / 2) / step) * step
 
-        // After presenter sets current value, reflect it to the slider
-        slider.value = presenter.currentG()
+        // ✅ Format the label (tooltip) as kg, e.g. “0.55”
+        slider.setLabelFormatter { value ->
+            String.format("%.2f", value / 1000f)
+        }
 
-        // Listeners
+        slider.post {
+            try {
+                slider.value = snapped.toFloat()
+            } catch (_: Exception) {
+                slider.value = 500f
+            }
+        }
+
+        presenter.onInit(slotName, snapped)
+
         slider.addOnChangeListener { _, value, _ ->
             presenter.onSliderChanged(value)
         }
+
         btnSave.setOnClickListener { presenter.onSaveClicked() }
         btnCancel.setOnClickListener { presenter.onCancelClicked() }
         btnBack.setOnClickListener { presenter.onBackClicked() }
     }
 
     // ===== EditThresholdView =====
-    override fun renderTitle(slotName: String) {
-        tvTitle.text = slotName
-    }
+    override fun renderTitle(slotName: String) { tvTitle.text = slotName }
 
-    override fun renderThresholdKgText(kgText: String) {
-        tvThresholdValue.text = kgText
-    }
+    override fun renderThresholdKgText(kgText: String) { tvThresholdValue.text = kgText }
 
     override fun closeWithResult(thresholdGrams: Int) {
-        intent.putExtra(RESULT_THRESHOLD_G, thresholdGrams)
-        setResult(Activity.RESULT_OK, intent)
+        val data = Intent().apply { putExtra(RESULT_THRESHOLD_G, thresholdGrams) }
+        setResult(Activity.RESULT_OK, data)
         finish()
     }
 

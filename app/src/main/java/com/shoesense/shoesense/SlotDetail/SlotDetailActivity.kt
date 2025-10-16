@@ -4,6 +4,7 @@ package com.shoesense.shoesense.SlotDetail
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -29,12 +30,16 @@ class SlotDetailActivity : AppCompatActivity(), SlotDetailView {
     private lateinit var swNotif: SwitchMaterial
 
     private var suppressNotifCallback = false
+    private var slotId: String = ""
 
     private val editThresholdLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val newG = result.data!!.getIntExtra(EditThresholdActivity.RESULT_THRESHOLD_G, presenter.getThresholdGrams())
+            val newG = result.data!!.getIntExtra(
+                EditThresholdActivity.RESULT_THRESHOLD_G,
+                presenter.getThresholdGrams()
+            )
             presenter.applyNewThreshold(newG)
         }
     }
@@ -42,16 +47,23 @@ class SlotDetailActivity : AppCompatActivity(), SlotDetailView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_slot_detail)
-
         bindViews()
+
+        // Get slot id from intent (you already pass this from Home)
+        slotId = intent.getStringExtra("slot_id") ?: ""
+        if (slotId.isBlank()) {
+            showToast("Missing slot id"); finish(); return
+        }
+
         wireClicks()
 
         presenter = SlotDetailPresenter(this)
+        presenter.attach(slotId) // start live observation
+    }
 
-        val initialName = intent.getStringExtra("slot_name")
-        val initialStatus = intent.getStringExtra("slot_status")
-        val initialNotif = intent.getBooleanExtra("slot_notif", false)
-        presenter.onInit(initialName, initialStatus, initialNotif)
+    override fun onDestroy() {
+        presenter.detach()
+        super.onDestroy()
     }
 
     private fun bindViews() {
@@ -70,13 +82,14 @@ class SlotDetailActivity : AppCompatActivity(), SlotDetailView {
         btnRename.setOnClickListener { presenter.onRenameClicked() }
         btnDelete.setOnClickListener { presenter.onDeleteClicked() }
         btnEditThreshold.setOnClickListener {
-            // Navigate to EditThresholdActivity, passing current values
             val intent = Intent(this, EditThresholdActivity::class.java).apply {
                 putExtra(EditThresholdActivity.EXTRA_SLOT_NAME, presenter.getSlotName())
                 putExtra(EditThresholdActivity.EXTRA_THRESHOLD_G, presenter.getThresholdGrams())
+                putExtra(EditThresholdActivity.EXTRA_SLOT_ID, slotId)  // 🆕
             }
             editThresholdLauncher.launch(intent)
         }
+
         swNotif.setOnCheckedChangeListener { _, isChecked ->
             if (suppressNotifCallback) return@setOnCheckedChangeListener
             presenter.onNotificationsToggled(isChecked)
@@ -84,10 +97,13 @@ class SlotDetailActivity : AppCompatActivity(), SlotDetailView {
     }
 
     // ===== SlotDetailView =====
-
     override fun showSlotName(name: String) { tvTitle.text = name }
 
-    override fun showStatus(status: String) { tvStatus.text = status }
+    override fun showStatus(status: String) {
+        tvStatus.text = status
+        // Optional: change background color based on status
+        tvStatus.setBackgroundResource(if (status == "Occupied") R.drawable.bg_green else R.drawable.bg_red)
+    }
 
     override fun showTimeline(occupiedAt: String?, emptyAt: String?) {
         val occ = occupiedAt?.let { "Occupied at $it" }
@@ -109,8 +125,30 @@ class SlotDetailActivity : AppCompatActivity(), SlotDetailView {
 
     override fun navigateBack() { finish() }
 
-    // If you kept rename/delete dialogs from earlier, keep those methods here.
-    override fun askForNewName(current: String, onResult: (String?) -> Unit) { /* ... */ }
-    override fun confirmDelete(slotName: String, onResult: (Boolean) -> Unit) { /* ... */ }
-    override fun askForNewThreshold(current: Int, onResult: (Int?) -> Unit) { /* not used now */ }
+    // Dialogs
+    override fun askForNewName(current: String, onResult: (String?) -> Unit) {
+        val input = EditText(this).apply { setText(current) }
+        AlertDialog.Builder(this)
+            .setTitle("Rename Slot")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ -> onResult(input.text?.toString()) }
+            .setNegativeButton("Cancel") { _, _ -> onResult(null) }
+            .show()
+    }
+
+    override fun confirmDelete(slotName: String, onResult: (Boolean) -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete $slotName?")
+            .setMessage("This will remove the slot and its data.")
+            .setPositiveButton("Delete") { _, _ -> onResult(true) }
+            .setNegativeButton("Cancel") { _, _ -> onResult(false) }
+            .show()
+    }
+
+    override fun askForNewThreshold(current: Int, onResult: (Int?) -> Unit) {
+        // Not used here (you launch EditThresholdActivity), but kept to satisfy interface
+        onResult(null)
+    }
+
+    override fun getActivityContext() = this
 }

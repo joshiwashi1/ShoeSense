@@ -5,4 +5,5 @@ interface AddSlotView {
     fun showThreshold(value: Float)
     fun showToast(msg: String)
     fun closeScreen()
+    fun onSaved()
 }

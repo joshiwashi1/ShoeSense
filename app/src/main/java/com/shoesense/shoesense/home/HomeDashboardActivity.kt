@@ -20,20 +20,19 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     private lateinit var adapter: SlotAdapter
     private lateinit var presenter: HomeDashboardPresenter
 
-    // refresh list after returning from AddSlotActivity or SlotDetailActivity
     private val refreshLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) {
-        presenter.load()
+    ) { res ->
+        if (res.resultCode == AddSlotActivity.RESULT_SAVED) {
+            presenter.load()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_dashboard)
 
-        presenter = HomeDashboardPresenter(this)
-        presenter.attach(this)
-
+        // 1) INIT UI FIRST
         rv = findViewById(R.id.slotRecyclerView)
         rv.layoutManager = GridLayoutManager(this, 2)
         adapter = SlotAdapter(
@@ -42,22 +41,19 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         )
         rv.adapter = adapter
 
-        // ✅ Call the navbar AFTER setContentView so the views exist
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
             callbacks = BottomNavbar.Callbacks(
-                onHome = { /* already here; maybe scroll to top */ rv.smoothScrollToPosition(0) },
-                //onAnalytics = { startActivity(Intent(this, AnalyticsActivity::class.java)) },
-                //onNotifications = { startActivity(Intent(this, NotificationsActivity::class.java)) },
+                onHome = { rv.smoothScrollToPosition(0) },
                 onSettings = { startActivity(Intent(this, SettingsActivity::class.java)) }
             ),
-            // Optional visual config:
-            // selectedTint = ContextCompat.getColor(this, android.R.color.black),
-            // unselectedTint = ContextCompat.getColor(this, R.color.gray_500),
             unselectedAlpha = 0.45f
         )
 
+        // 2) THEN PRESENTER
+        presenter = HomeDashboardPresenter(this)
+        presenter.attach(this)  // observe can safely render now
         presenter.load()
     }
 
@@ -66,13 +62,19 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         super.onDestroy()
     }
 
-    // --- HomeDashboardView Implementation ---
+    // --- HomeDashboardView ---
     override fun render(items: List<SlotRow>) {
+        // (Optional extra guard; harmless and prevents future regressions)
+        if (!::adapter.isInitialized) return
         adapter.submitList(items)
     }
 
     override fun openAddSlot() {
         val slotNum = presenter.nextSlotNumber()
+        if (slotNum <= 0) {
+            showError("Maximum of 12 slots reached.")
+            return
+        }
         val intent = Intent(this, AddSlotActivity::class.java)
             .putExtra(AddSlotActivity.EXTRA_SLOT_NUMBER, slotNum)
         refreshLauncher.launch(intent)
@@ -90,7 +92,8 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun showError(message: String) {
-        // Toast / Snackbar here if you want
+        // You can Toast/Snackbar here if you want
+        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
