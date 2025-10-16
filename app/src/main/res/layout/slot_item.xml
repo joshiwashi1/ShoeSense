@@ -1,57 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="@android:color/white"
-    android:elevation="4dp"
-    android:layout_margin="8dp">
+    android:layout_margin="10dp"
+    app:cardCornerRadius="8dp"
+    app:cardUseCompatPadding="true"
+    app:strokeColor="#E5E7EB"
+    app:strokeWidth="1dp">
 
-    <!-- Slot Title -->
-    <TextView
-        android:id="@+id/slotTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Slot 1"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" />
-
-    <!-- Status Row -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp">
-
-        <ImageView
-            android:id="@+id/statusIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/checkbox_on_background"
-            app:tint="@android:color/holo_green_dark" />
+        android:orientation="vertical"
+        android:padding="12dp">
 
         <TextView
-            android:id="@+id/statusText"
+            android:id="@+id/tvSlotTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Slot 1"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="6dp"
+            android:background="#E5E7EB" />
+
+        <LinearLayout
+            android:id="@+id/statusRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgStatus"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_green"
+                android:contentDescription="status" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Occupied"
+                android:textStyle="bold"
+                android:textColor="#111827"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvUpdated"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Occupied"
-            android:textSize="16sp"
-            android:layout_marginStart="8dp"
-            android:textColor="@android:color/black" />
+            android:layout_marginTop="8dp"
+            android:text="Last Updated:\n10:30 AM"
+            android:textColor="#6B7280"
+            android:textSize="12sp" />
     </LinearLayout>
-
-    <!-- Last Updated -->
-    <TextView
-        android:id="@+id/lastUpdated"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last Updated: 10:30 AM"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        android:layout_marginTop="8dp" />
-</LinearLayout>
-
+</com.google.android.material.card.MaterialCardView>

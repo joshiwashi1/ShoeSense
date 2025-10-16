@@ -1,47 +1,100 @@
 package com.shoesense.shoesense.home
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Model.Slot
-import com.shoesense.shoesense.adapter.SlotAdapter
+import com.shoesense.shoesense.R
+import com.shoesense.shoesense.AddSlot.AddSlotActivity
+import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
+import com.shoesense.shoesense.settings.SettingsActivity
 
-class HomeDashboardActivity : AppCompatActivity() {
 
-    private lateinit var slotRecyclerView: RecyclerView
-    private lateinit var slotAdapter: SlotAdapter
-    private lateinit var slotList: MutableList<Slot>
+class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
+
+    private lateinit var rv: RecyclerView
+    private lateinit var adapter: SlotAdapter
+    private lateinit var presenter: HomeDashboardPresenter
+
+    // refresh list after returning from AddSlotActivity or SlotDetailActivity
+    private val refreshLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        presenter.load()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_dashboard)
 
-        // Initialize RecyclerView and Slot List
-        slotRecyclerView = findViewById(R.id.slotRecyclerView)
-        slotList = mutableListOf()
+        presenter = HomeDashboardPresenter(this)
+        presenter.attach(this)
 
-        // Initialize SlotAdapter
-        slotAdapter = SlotAdapter(slotList) {
-            addSlot("New Slot", true, "5:00 PM")  // Add new slot when the button is clicked
-        }
+        rv = findViewById(R.id.slotRecyclerView)
+        rv.layoutManager = GridLayoutManager(this, 2)
+        adapter = SlotAdapter(
+            onAdd = { presenter.onAddClicked() },
+            onClick = { slot -> presenter.onSlotClicked(slot) }
+        )
+        rv.adapter = adapter
 
-        // Set Layout Manager and Adapter
-        slotRecyclerView.layoutManager = GridLayoutManager(this, 2)
-        slotRecyclerView.adapter = slotAdapter
+        // ✅ Call the navbar AFTER setContentView so the views exist
+        BottomNavbar.attach(
+            activity = this,
+            defaultSelected = BottomNavbar.Item.HOME,
+            callbacks = BottomNavbar.Callbacks(
+                onHome = { /* already here; maybe scroll to top */ rv.smoothScrollToPosition(0) },
+                //onAnalytics = { startActivity(Intent(this, AnalyticsActivity::class.java)) },
+                //onNotifications = { startActivity(Intent(this, NotificationsActivity::class.java)) },
+                onSettings = { startActivity(Intent(this, SettingsActivity::class.java)) }
+            ),
+            // Optional visual config:
+            // selectedTint = ContextCompat.getColor(this, android.R.color.black),
+            // unselectedTint = ContextCompat.getColor(this, R.color.gray_500),
+            unselectedAlpha = 0.45f
+        )
 
-        // Add some initial slots (you can fetch this from a database or API)
-        addSlot("Slot 1", true, "10:30 AM")
-        addSlot("Slot 2", false, "9:45 AM")
-        addSlot("Slot 3", false, "--")
-        addSlot("Slot 4", false, "8:15 AM")
+        presenter.load()
     }
 
-    // Function to add a slot to the list
-    private fun addSlot(title: String, isOccupied: Boolean, lastUpdated: String) {
-        val newSlot = Slot(title, isOccupied, lastUpdated)
-        slotList.add(newSlot)  // Add new slot to the list
-        slotAdapter.notifyItemInserted(slotList.size - 1)  // Notify adapter of new item
+    override fun onDestroy() {
+        presenter.detach()
+        super.onDestroy()
+    }
+
+    // --- HomeDashboardView Implementation ---
+    override fun render(items: List<SlotRow>) {
+        adapter.submitList(items)
+    }
+
+    override fun openAddSlot() {
+        val slotNum = presenter.nextSlotNumber()
+        val intent = Intent(this, AddSlotActivity::class.java)
+            .putExtra(AddSlotActivity.EXTRA_SLOT_NUMBER, slotNum)
+        refreshLauncher.launch(intent)
+    }
+
+    override fun openSlotDetail(slot: Slot) {
+        val intent = Intent(this, SlotDetailActivity::class.java).apply {
+            putExtra("slot_id", slot.id)
+            putExtra("slot_name", slot.name)
+            putExtra("occupied", slot.occupied)
+            putExtra("last_updated", slot.lastUpdated)
+        }
+        refreshLauncher.launch(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
+    override fun showError(message: String) {
+        // Toast / Snackbar here if you want
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.load()
     }
 }

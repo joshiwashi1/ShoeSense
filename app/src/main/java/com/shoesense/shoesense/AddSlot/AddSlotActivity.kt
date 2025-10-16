@@ -1,18 +1,23 @@
 package com.shoesense.shoesense.AddSlot
 
+import android.app.Activity
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.shoesense.shoesense.R
 
 class AddSlotActivity : AppCompatActivity(), AddSlotView {
+
+    companion object {
+        const val EXTRA_SLOT_NUMBER = "slot_number"   // 1-based index you pass in from Home
+        const val RESULT_SAVED = 1001                 // optional result code to trigger refresh
+    }
 
     private lateinit var presenter: AddSlotPresenter
 
@@ -24,14 +29,13 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
     private lateinit var btnCancel: MaterialButton
     private lateinit var btnBack: ImageButton
 
-    // Optional: pass in from previous screen; default 6
-    private val slotNumber: Int by lazy { intent.getIntExtra("slotNumber", 6) }
+    private var slotNumber: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_slot)
+        setContentView(R.layout.activity_add_slot) // your XML file name
 
-        presenter = AddSlotPresenter(this, this)
+        slotNumber = intent.getIntExtra(EXTRA_SLOT_NUMBER, 1)
 
         tvSlotLabel = findViewById(R.id.tvSlotLabel)
         tvThresholdValue = findViewById(R.id.tvThresholdValue)
@@ -43,63 +47,46 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
 
         tvSlotLabel.text = "Slot $slotNumber"
 
-        // Load saved state (if returning)
+        presenter = AddSlotPresenter(this, this)
         presenter.load(slotNumber)
 
-        // Slider events
         slider.addOnChangeListener { _, value, _ ->
+            tvThresholdValue.text = String.format("%.1f kg", value)
             presenter.setThreshold(slotNumber, value)
-            showThreshold(value)
         }
 
-        // Name dialog
         btnAddSlotName.setOnClickListener {
-            showNameDialog()
+            val input = EditText(this).apply { hint = "e.g., Dad’s Sneakers" }
+            AlertDialog.Builder(this)
+                .setTitle("Slot Name")
+                .setView(input)
+                .setPositiveButton("Save") { _, _ ->
+                    val name = input.text?.toString()?.trim().orEmpty()
+                    presenter.setName(slotNumber, name)
+                    showName(name)
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
 
-        // Save
         btnAddSlot.setOnClickListener {
             presenter.save(slotNumber)
+            setResult(RESULT_SAVED)
         }
 
-        // Cancel/back
         btnCancel.setOnClickListener { finish() }
         btnBack.setOnClickListener { finish() }
     }
 
-    private fun showNameDialog() {
-        val til = TextInputLayout(this).apply {
-            isHintEnabled = true
-            hint = "Enter slot name"
-            setPadding(32, 16, 32, 0)
-        }
-        val edit = TextInputEditText(til.context).apply {
-            setText(presenter.getName(slotNumber) ?: "")
-            setSelection(text?.length ?: 0)
-        }
-        til.addView(edit)
-
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Slot Name")
-            .setView(til)
-            .setPositiveButton("Save") { d, _ ->
-                val name = edit.text?.toString()?.trim().orEmpty()
-                presenter.setName(slotNumber, name)
-                showName(name)
-                d.dismiss()
-            }
-            .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
-            .show()
-    }
-
-    /* ==== AddSlotView ==== */
+    // --- AddSlotView ---
     override fun showName(name: String) {
+        // reflect chosen name under the big button label if you want
         btnAddSlotName.text = if (name.isBlank()) "Add Slot Name" else name
     }
 
     override fun showThreshold(value: Float) {
+        slider.value = value
         tvThresholdValue.text = String.format("%.1f kg", value)
-        if (slider.value != value) slider.value = value
     }
 
     override fun showToast(msg: String) {
@@ -107,7 +94,6 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
     }
 
     override fun closeScreen() {
-        setResult(RESULT_OK)
         finish()
     }
 }
