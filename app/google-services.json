@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "931222493490",
+    "firebase_url": "https://shoesense-fd107-default-rtdb.firebaseio.com",
+    "project_id": "shoesense-fd107",
+    "storage_bucket": "shoesense-fd107.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931222493490:android:1115fe245af2f353901f2b",
+        "android_client_info": {
+          "package_name": "com.shoesense.shoesense"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATcXq64TMltjUrqwWAirmKGVG2uLmw8_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

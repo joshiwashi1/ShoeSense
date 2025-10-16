@@ -1,23 +1,27 @@
 package com.shoesense.shoesense.register
 
+import com.google.firebase.firestore.FirebaseFirestore
 import com.shoesense.shoesense.Model.AuthRepository
 
 class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Presenter {
 
-    override fun onCreateAccountClicked(name: String, email: String, password: String, confirmPassword: String) {
-        // Validate Name
+    private val db = FirebaseFirestore.getInstance()
+
+    override fun onCreateAccountClicked(
+        name: String,
+        email: String,
+        password: String,
+        confirmPassword: String
+    ) {
+        // === VALIDATION ===
         if (name.isEmpty()) {
             view.showNameError("Name cannot be empty")
             return
         }
-
-        // Validate Email
         if (email.isEmpty() || !isValidEmail(email)) {
             view.showEmailError("Enter a valid email address")
             return
         }
-
-        // Validate Password
         if (password.isEmpty()) {
             view.showPasswordError("Password cannot be empty")
             return
@@ -25,8 +29,6 @@ class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Pres
             view.showPasswordError("Password must be at least 6 characters")
             return
         }
-
-        // Validate Confirm Password
         if (confirmPassword.isEmpty()) {
             view.showConfirmPasswordError("Confirm Password cannot be empty")
             return
@@ -35,13 +37,41 @@ class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Pres
             return
         }
 
-        // Try to register the user
-        val success = AuthRepository.registerUser(name, email, password)
-        if (success) {
-            view.showSuccessMessage("Sign-Up Successful!")
-        } else {
-            view.showEmailError("An account with this email already exists.")
-        }
+        // === CHECK IF EMAIL ALREADY EXISTS ===
+        view.showLoading(true)
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    view.showLoading(false)
+                    view.showEmailError("An account with this email already exists.")
+                } else {
+                    // === CREATE NEW USER DOCUMENT ===
+                    val userData = hashMapOf(
+                        "name" to name,
+                        "email" to email,
+                        "password" to password, // ⚠️ plain text for now
+                        "createdAt" to System.currentTimeMillis()
+                    )
+
+                    db.collection("users")
+                        .add(userData)
+                        .addOnSuccessListener {
+                            view.showLoading(false)
+                            view.showSuccessMessage("Sign-Up Successful!")
+                            view.navigateToLogin()
+                        }
+                        .addOnFailureListener { e ->
+                            view.showLoading(false)
+                            view.showErrorMessage("Failed to save user: ${e.message}")
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                view.showLoading(false)
+                view.showErrorMessage("Error checking email: ${e.message}")
+            }
     }
 
     private fun isValidEmail(email: String): Boolean {
