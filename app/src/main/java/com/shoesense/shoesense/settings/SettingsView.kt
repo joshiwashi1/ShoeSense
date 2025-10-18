@@ -6,7 +6,7 @@ interface SettingsView {
     fun navigateToMyAccount()
     fun navigateToChangePassword()
     fun navigateToManageShelf()
-    fun navigateToHelp()
+    fun navigateToAbout()
     fun signOut()
 
     fun showMessage(msg: String)

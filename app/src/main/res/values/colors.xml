@@ -13,4 +13,9 @@
     <color name="darker_gray">#A9A9A9</color>
     <color name="gray">#808080</color>
     <color name="blue_main">#0084FF</color>
+    <!-- res/values/colors.xml -->
+    <color name="yellowPrimary">#FFD428</color>
+    <color name="blueAccent">#2DA4FF</color>
+    <color name="surfaceLight">#F3F4F6</color>
+    <color name="black_70">#70111111</color>
 </resources>

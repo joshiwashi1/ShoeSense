@@ -13,6 +13,12 @@
         android:theme="@style/Theme.ShoeSense"
         tools:targetApi="31">
         <activity
+            android:name=".ManageShelf.ManageShelfActivity"
+            android:exported="false" />
+        <activity
+            android:name=".about.AboutActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddSlot.AddSlotActivity"
             android:exported="false" />
         <activity

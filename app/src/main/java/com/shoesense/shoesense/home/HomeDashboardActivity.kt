@@ -2,6 +2,7 @@ package com.shoesense.shoesense.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,12 +14,16 @@ import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
-
 class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
     private lateinit var rv: RecyclerView
     private lateinit var adapter: SlotAdapter
     private lateinit var presenter: HomeDashboardPresenter
+
+    // Overview counters
+    private lateinit var tvActiveSlots: TextView
+    private lateinit var tvEmptySlots: TextView
+    private lateinit var tvTotalSlots: TextView
 
     private val refreshLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -32,7 +37,14 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_dashboard)
 
-        // 1) INIT UI FIRST
+        // --- bind Overview counters ---
+        tvActiveSlots = findViewById(R.id.tvActiveSlots)
+        // NOTE: XML id is tvNotifications but the label is "Empty Slots"
+        // (feel free to rename the id in XML to tvEmptySlots later)
+        tvEmptySlots = findViewById(R.id.tvNotifications)
+        tvTotalSlots = findViewById(R.id.tvTotalSlots)
+
+        // --- init grid ---
         rv = findViewById(R.id.slotRecyclerView)
         rv.layoutManager = GridLayoutManager(this, 2)
         adapter = SlotAdapter(
@@ -41,6 +53,7 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         )
         rv.adapter = adapter
 
+        // --- bottom nav ---
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
@@ -51,9 +64,9 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
             unselectedAlpha = 0.45f
         )
 
-        // 2) THEN PRESENTER
+        // --- presenter ---
         presenter = HomeDashboardPresenter(this)
-        presenter.attach(this)  // observe can safely render now
+        presenter.attach(this)
         presenter.load()
     }
 
@@ -64,9 +77,18 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
     // --- HomeDashboardView ---
     override fun render(items: List<SlotRow>) {
-        // (Optional extra guard; harmless and prevents future regressions)
         if (!::adapter.isInitialized) return
         adapter.submitList(items)
+
+        // derive counts from what we actually render
+        val dataRows = items.filterIsInstance<SlotRow.Data>()
+        val total = dataRows.size
+        val active = dataRows.count { it.slot.occupied }
+        val empty = total - active
+
+        tvActiveSlots.text = active.toString()
+        tvEmptySlots.text  = empty.toString()
+        tvTotalSlots.text  = total.toString()
     }
 
     override fun openAddSlot() {
@@ -92,8 +114,7 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun showError(message: String) {
-        // You can Toast/Snackbar here if you want
-        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        // Toast/Snackbar if desired
     }
 
     override fun onResume() {
