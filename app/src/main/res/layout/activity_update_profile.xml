@@ -1,22 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:fillViewport="true">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp">
 
-        <!-- Back Button -->
-        <ImageView
+        <!-- Back Button (as requested, ConstraintLayout attributes) -->
+        <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@android:drawable/ic_media_previous"
-            android:contentDescription="Back"
-            android:layout_alignParentStart="true"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="0dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.044"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/button_back"
             app:tint="@android:color/black" />
 
         <!-- Profile Image -->
@@ -24,120 +36,133 @@
             android:id="@+id/imgProfile"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_below="@id/btnBack"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:src="@drawable/profile_icon"
-            android:scaleType="centerCrop"
             android:background="@drawable/circle_shape"
-            android:padding="2dp" />
+            android:padding="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_icon"
+            app:layout_constraintTop_toBottomOf="@id/btnBack"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/imgProfile"
-            android:background="@drawable/textviewcolor_yellowbackgroundroundedcorners"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
+            android:background="@drawable/textviewcolor_yellowbackgroundroundedcorners"
+            android:fontFamily="sans-serif"
             android:text="Update Profile"
+            android:textColor="@color/black"
             android:textSize="35sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            android:fontFamily="sans-serif" />
+            app:layout_constraintTop_toBottomOf="@id/imgProfile"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Username Label -->
         <TextView
             android:id="@+id/username_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvTitle"
             android:layout_marginTop="40dp"
+            android:fontFamily="sans-serif"
             android:text="Username:"
-            android:textSize="14sp"
             android:textColor="@color/black"
-            android:fontFamily="sans-serif" />
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <!-- Username Input -->
         <EditText
             android:id="@+id/username_edit_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/username_label"
             android:layout_marginTop="5dp"
-            android:hint="Enter your username"
-            android:padding="12dp"
             android:background="@drawable/edittext_bg"
             android:fontFamily="sans-serif"
+            android:hint="Enter your username"
+            android:padding="12dp"
             android:textColor="@color/black"
-            android:textColorHint="@color/darker_gray" />
+            android:textColorHint="@color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/username_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Name Label -->
         <TextView
             android:id="@+id/name_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/username_edit_text"
             android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif"
             android:text="Name:"
-            android:textSize="14sp"
             android:textColor="@color/black"
-            android:fontFamily="sans-serif" />
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/username_edit_text"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <!-- Name Input -->
         <EditText
             android:id="@+id/name_edit_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/name_label"
             android:layout_marginTop="5dp"
-            android:hint="Enter your full name"
-            android:padding="12dp"
             android:background="@drawable/edittext_bg"
             android:fontFamily="sans-serif"
+            android:hint="Enter your full name"
+            android:padding="12dp"
             android:textColor="@color/black"
-            android:textColorHint="@color/darker_gray" />
+            android:textColorHint="@color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/name_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Email Label -->
         <TextView
             android:id="@+id/email_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/name_edit_text"
             android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif"
             android:text="Email:"
-            android:textSize="14sp"
             android:textColor="@color/black"
-            android:fontFamily="sans-serif" />
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/name_edit_text"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <!-- Email Input -->
         <EditText
             android:id="@+id/email_edit_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/email_label"
             android:layout_marginTop="5dp"
-            android:hint="Enter your email"
-            android:padding="12dp"
-            android:inputType="textEmailAddress"
             android:background="@drawable/edittext_bg"
             android:fontFamily="sans-serif"
+            android:hint="Enter your email"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
             android:textColor="@color/black"
-            android:textColorHint="@color/darker_gray" />
+            android:textColorHint="@color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/email_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Save Button -->
         <Button
             android:id="@+id/btnSave"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/email_edit_text"
             android:layout_marginTop="30dp"
             android:backgroundTint="#2196F3"
+            android:fontFamily="sans-serif"
             android:text="Save Changes"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:fontFamily="sans-serif" />
+            app:layout_constraintTop_toBottomOf="@id/email_edit_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
