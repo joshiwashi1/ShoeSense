@@ -39,6 +39,7 @@ class ForgotPasswordActivity : Activity(), ForgotPasswordView {
         }
     }
 
+
     // --- Callbacks from Presenter ---
     override fun closeScreen() {
         finish()
