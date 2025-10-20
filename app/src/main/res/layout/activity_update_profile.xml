@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:context=".UpdateProfile.UpdateProfileActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,8 +16,8 @@
         <!-- Back Button (as requested, ConstraintLayout attributes) -->
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginTop="16dp"
             android:adjustViewBounds="true"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -50,16 +51,19 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="8dp"
             android:background="@drawable/textviewcolor_yellowbackgroundroundedcorners"
-            android:fontFamily="sans-serif"
+            android:fontFamily="sans-serif-medium"
             android:text="Update Profile"
             android:textColor="@color/black"
-            android:textSize="35sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/imgProfile"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
 
         <!-- Username Label -->
         <TextView

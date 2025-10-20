@@ -114,7 +114,7 @@
             android:layout_height="wrap_content"
             android:text="Login Here"
             android:textSize="14sp"
-            android:textColor="@android:color/holo_red_dark"
+            android:textColor="@color/blue_main"
             android:textStyle="bold"/>
     </LinearLayout>
 

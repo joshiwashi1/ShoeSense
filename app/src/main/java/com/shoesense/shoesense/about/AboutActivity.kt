@@ -43,7 +43,7 @@ class AboutActivity : AppCompatActivity(), AboutView {
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
-                onAnalytics = {
+                onHistory = {
                     // startActivity(Intent(this, AnalyticsActivity::class.java))
                     // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     // finish()

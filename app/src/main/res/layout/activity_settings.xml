@@ -314,9 +314,9 @@
                 android:contentDescription="Home" />
         </LinearLayout>
 
-        <!-- Analytics -->
+        <!-- History -->
         <LinearLayout
-            android:id="@+id/navAnalytics"
+            android:id="@+id/navHistory"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -329,7 +329,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/history_icon"
-                android:contentDescription="Analytics" />
+                android:contentDescription="History" />
         </LinearLayout>
 
         <!-- Notifications -->

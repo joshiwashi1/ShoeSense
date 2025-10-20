@@ -9,24 +9,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
         android:padding="20dp">
 
-        <!-- Back Button -->
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="start"
-            android:src="@android:drawable/ic_media_previous"
-            android:contentDescription="Back"
-            app:tint="@android:color/black" />
+        <!-- ✅ Top Bar with Back Button and Title (optional) -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp">
 
-        <!-- Profile Image -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:contentDescription="Back"
+                app:srcCompat="@drawable/button_back"
+                app:tint="@android:color/black"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+
+            <!-- Optional centered title -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
+
+        <!-- ✅ Profile Image -->
         <ImageView
             android:id="@+id/imgProfile"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_gravity="center"
             android:src="@drawable/profile_icon"
             android:layout_marginTop="20dp"
             android:scaleType="centerCrop"
@@ -38,6 +60,7 @@
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="Johnny Bravo"
             android:textStyle="bold"
             android:textSize="18sp"
@@ -49,6 +72,7 @@
             android:id="@+id/tvEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="john.b@example.com"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -66,34 +90,52 @@
 
         <!-- Account Info Section -->
         <LinearLayout
+            android:id="@+id/sectionAccountInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="20dp"
             android:padding="10dp">
 
+            <!-- Email label -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username: JohnB69"
+                android:text="Email:"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="6dp" />
+
+            <!-- Email value (placeholder to be filled) -->
+            <TextView
+                android:id="@+id/profileEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="name placeholder"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="10dp" />
 
+            <!-- Name label -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Name: Johnny B. Bravo"
+                android:text="Name:"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="6dp" />
+
+            <!-- Name value (placeholder to be filled) -->
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="name placeholder"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Email: john.b@example.com"
-                android:textSize="16sp"
-                android:textColor="@android:color/black" />
         </LinearLayout>
 
         <!-- Blue Button -->
@@ -103,7 +145,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:backgroundTint="#2196F3"
-            android:text="Update Profile"
+            android:text="Edit Profile"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 

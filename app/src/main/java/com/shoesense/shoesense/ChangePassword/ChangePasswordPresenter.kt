@@ -1,4 +1,4 @@
-package com.shoesense.shoesense.changepassword
+package com.shoesense.shoesense.ChangePassword
 
 class ChangePasswordPresenter(private val view: ChangePasswordView.View) : ChangePasswordView.Presenter {
 

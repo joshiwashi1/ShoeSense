@@ -1,28 +1,28 @@
-package com.shoesense.shoesense.notification
+package com.shoesense.shoesense.history
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.BottomNavbar
-import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.home.HomeDashboardActivity
+import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
-class NotificationActivity : AppCompatActivity(), NotificationView {
+class HistoryActivity : AppCompatActivity(), HistoryView {
 
-    private lateinit var presenter: NotificationPresenter
+    private lateinit var presenter: HistoryPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_notification)
+        setContentView(R.layout.activity_history)
 
-        presenter = NotificationPresenter(this)
+        presenter = HistoryPresenter(this)
 
-        // ✅ Follow the same binding style as SettingsActivity
+        // ✅ Bottom navigation binding (same style as SettingsActivity)
         BottomNavbar.attach(
             activity = this,
-            defaultSelected = BottomNavbar.Item.NOTIFICATIONS,  // highlight notifications
+            defaultSelected = BottomNavbar.Item.HISTORY,
             callbacks = BottomNavbar.Callbacks(
                 onHome = {
                     startActivity(Intent(this, HomeDashboardActivity::class.java))
@@ -30,12 +30,12 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
                     finish()
                 },
                 onHistory = {
-                    startActivity(Intent(this, HistoryActivity::class.java))
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                    finish()
+                    // already here — do nothing
                 },
                 onNotifications = {
-                    // already here — no-op
+                    startActivity(Intent(this, NotificationActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
                 },
                 onSettings = {
                     startActivity(Intent(this, SettingsActivity::class.java))

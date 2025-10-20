@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFD428">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#FFD428"
+    tools:context=".history.HistoryActivity">
 
     <!-- Title -->
     <TextView
@@ -106,9 +108,9 @@
                 android:contentDescription="Home" />
         </LinearLayout>
 
-        <!-- Analytics -->
+        <!-- History -->
         <LinearLayout
-            android:id="@+id/navAnalytics"
+            android:id="@+id/navHistory"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

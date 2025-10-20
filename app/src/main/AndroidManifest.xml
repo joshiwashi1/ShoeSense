@@ -13,6 +13,15 @@
         android:theme="@style/Theme.ShoeSense"
         tools:targetApi="31">
         <activity
+            android:name=".UpdateProfile.UpdateProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".history.HistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".notification.NotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ManageShelf.ManageShelfActivity"
             android:exported="false" />
         <activity
@@ -34,10 +43,7 @@
             android:name=".profile.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".changepassword.ChangePasswordActivity"
-            android:exported="false" />
-        <activity
-            android:name=".forgotpassword.ForgotPasswordEmailSubmitActivity"
+            android:name=".ChangePassword.ChangePasswordActivity"
             android:exported="false" />
         <activity
             android:name=".forgotpassword.ForgotPasswordActivity"

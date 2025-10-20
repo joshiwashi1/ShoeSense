@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shoesense.shoesense.Model.Slot
@@ -12,6 +13,8 @@ import com.shoesense.shoesense.R
 import com.shoesense.shoesense.AddSlot.AddSlotActivity
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
+import com.shoesense.shoesense.history.HistoryActivity
+import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
 class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
@@ -54,14 +57,35 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         rv.adapter = adapter
 
         // --- bottom nav ---
+        // --- bottom nav hookup (AFTER setContentView) ---
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
             callbacks = BottomNavbar.Callbacks(
-                onHome = { rv.smoothScrollToPosition(0) },
-                onSettings = { startActivity(Intent(this, SettingsActivity::class.java)) }
+                onHome = {
+                    // already here — just scroll to top
+                    rv.smoothScrollToPosition(0)
+                },
+                onHistory = {
+                    // TODO: start AnalyticsActivity
+                    // startActivity(Intent(this, AnalyticsActivity::class.java))
+                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                },
+                onNotifications = {
+                    // TODO: start NotificationsActivity
+                    // startActivity(Intent(this, NotificationsActivity::class.java))
+                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                },
+                onSettings = {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    // don't finish() so Back returns to Home
+                }
             ),
-            unselectedAlpha = 0.45f
+            // same visual rules as Settings: selected=solid white, others faded
+            selectedTint   = resources.getColor(android.R.color.white, theme),
+            unselectedTint = resources.getColor(android.R.color.white, theme),
+            unselectedAlpha = 0.35f
         )
 
         // --- presenter ---

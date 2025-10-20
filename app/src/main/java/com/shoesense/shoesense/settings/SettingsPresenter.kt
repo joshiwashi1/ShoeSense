@@ -20,6 +20,8 @@ class SettingsPresenter(
         view.setNotificationEnabled(enabled)
     }
 
+
+
     companion object {
         private const val PREFS_NAME = "settings_prefs"
         private const val KEY_NOTIF_ENABLED = "notif_enabled"

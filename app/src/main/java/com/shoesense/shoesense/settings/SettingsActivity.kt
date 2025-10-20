@@ -3,13 +3,21 @@ package com.shoesense.shoesense.settings
 import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
-import com.google.android.material.switchmaterial.SwitchMaterial
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.button.MaterialButton
+import com.shoesense.shoesense.ChangePassword.ChangePasswordActivity
 import com.shoesense.shoesense.ManageShelf.ManageShelfActivity
 import com.shoesense.shoesense.R
+import com.shoesense.shoesense.Repository.AuthRepository
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.about.AboutActivity
+import com.shoesense.shoesense.history.HistoryActivity
+import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.home.HomeDashboardActivity
+import com.shoesense.shoesense.login.LoginActivity
+import com.shoesense.shoesense.profile.ProfileActivity
 
 class SettingsActivity : AppCompatActivity(), SettingsView {
 
@@ -22,13 +30,12 @@ class SettingsActivity : AppCompatActivity(), SettingsView {
     private lateinit var switchNotifications: SwitchMaterial
 
     private lateinit var presenter: SettingsPresenter
-    private var isUserTogglingSwitch = false  // avoid feedback loop
+    private var isUserTogglingSwitch = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        // --- Bottom nav hookup (must be AFTER setContentView) ---
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.SETTINGS,
@@ -38,8 +45,8 @@ class SettingsActivity : AppCompatActivity(), SettingsView {
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
-                onAnalytics = { /* future activity */ },
-                onNotifications = { /* future activity */ },
+                onHistory = { navigateToHistory() },
+                onNotifications = { navigateToNotifications() },
                 onSettings = { /* already here */ }
             ),
             unselectedAlpha = 0.45f
@@ -54,21 +61,21 @@ class SettingsActivity : AppCompatActivity(), SettingsView {
         signOutLayout = findViewById(R.id.signoutLayout)
         switchNotifications = findViewById(R.id.switchNotifications)
 
-        // --- Presenter ---
         presenter = SettingsPresenter(this, this)
-
-        // Initialize switch from stored preference
         setNotificationEnabled(presenter.isNotificationsEnabled())
 
-        // --- Click listeners ---
+        // --- Clicks ---
         myAccountLayout.setOnClickListener { navigateToMyAccount() }
         changePasswordLayout.setOnClickListener { navigateToChangePassword() }
         manageShelfLayout.setOnClickListener { navigateToManageShelf() }
-        aboutLayout.setOnClickListener { navigateToAbout() } // new click action
-        notificationLayout.setOnClickListener { switchNotifications.toggle() }
-        signOutLayout.setOnClickListener { signOut() }
+        aboutLayout.setOnClickListener { navigateToAbout() }
 
-        // Switch toggle
+        // This row toggles the switch
+        notificationLayout.setOnClickListener { switchNotifications.toggle() }
+
+        // Show the custom sign-out confirmation dialog
+        signOutLayout.setOnClickListener { showSignOutDialog() }
+
         switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             if (!isUserTogglingSwitch) {
                 presenter.setNotificationsEnabled(isChecked)
@@ -85,15 +92,17 @@ class SettingsActivity : AppCompatActivity(), SettingsView {
     }
 
     override fun navigateToMyAccount() {
-        // startActivity(Intent(this, MyAccountActivity::class.java))
+        startActivity(Intent(this, ProfileActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     override fun navigateToChangePassword() {
-        // startActivity(Intent(this, ChangePasswordActivity::class.java))
+        startActivity(Intent(this, ChangePasswordActivity::class.java))
     }
 
     override fun navigateToManageShelf() {
         startActivity(Intent(this, ManageShelfActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     override fun navigateToAbout() {
@@ -101,12 +110,43 @@ class SettingsActivity : AppCompatActivity(), SettingsView {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
+    fun navigateToHistory() {
+        startActivity(Intent(this, HistoryActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
+    fun navigateToNotifications() {
+        startActivity(Intent(this, NotificationActivity::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
     override fun signOut() {
-        // TODO: clear session/shared prefs and go to login
-        // val intent = Intent(this, LoginActivity::class.java)
-        // intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        // startActivity(intent)
-        // finish()
+        AuthRepository.logout()
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+    }
+
+    private fun showSignOutDialog() {
+        val view = layoutInflater.inflate(R.layout.dialog_signout, null, false)
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(view)
+            .setCancelable(true)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val btnYes = view.findViewById<MaterialButton>(R.id.btnYes)
+        val btnNo  = view.findViewById<MaterialButton>(R.id.btnNo)
+
+        btnYes.setOnClickListener {
+            dialog.dismiss()
+            signOut()
+        }
+        btnNo.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
     }
 
     override fun showMessage(msg: String) {

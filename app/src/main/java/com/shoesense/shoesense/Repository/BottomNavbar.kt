@@ -11,11 +11,13 @@ import com.shoesense.shoesense.R
 
 object BottomNavbar {
 
-    enum class Item { HOME, ANALYTICS, NOTIFICATIONS, SETTINGS }
+    // 🔁 Renamed ANALYTICS -> HISTORY
+    enum class Item { HOME, HISTORY, NOTIFICATIONS, SETTINGS }
 
+    // 🔁 Added onHistory, removed onAnalytics
     data class Callbacks(
         val onHome: () -> Unit = {},
-        val onAnalytics: () -> Unit = {},
+        val onHistory: () -> Unit = {},
         val onNotifications: () -> Unit = {},
         val onSettings: () -> Unit = {}
     )
@@ -32,13 +34,17 @@ object BottomNavbar {
         unselectedAlpha: Float = 0.45f
     ) {
         val navHome = activity.findViewById<LinearLayout>(R.id.navHome)
-        val navAnalytics = activity.findViewById<LinearLayout>(R.id.navAnalytics)
+
+        // ✅ Prefer new id; fallback to old one if layout not updated yet
+        val navHistory = activity.findViewById<LinearLayout?>(R.id.navHistory)
+            ?: activity.findViewById(R.id.navHistory)
+
         val navNotifications = activity.findViewById<LinearLayout>(R.id.navNotifications)
         val navSettings = activity.findViewById<LinearLayout>(R.id.navSettings)
 
         val items = listOf(
             Pair(Item.HOME, navHome),
-            Pair(Item.ANALYTICS, navAnalytics),
+            Pair(Item.HISTORY, navHistory),
             Pair(Item.NOTIFICATIONS, navNotifications),
             Pair(Item.SETTINGS, navSettings)
         )
@@ -58,19 +64,23 @@ object BottomNavbar {
 
         fun applySelectedState(selected: Item) {
             items.forEach { (item, container) ->
-                val icon = iconOf(container)
+                val icon = iconOf(container) ?: return@forEach
                 val isSelected = (item == selected)
 
-                // Visuals: tint if provided, else alpha fallback
-                if (selectedTint != null && unselectedTint != null) {
-                    icon?.imageTintList = ColorStateList.valueOf(if (isSelected) selectedTint else unselectedTint)
-                    icon?.alpha = 1f
-                } else {
-                    icon?.alpha = if (isSelected) 1f else unselectedAlpha
-                }
+                // 1) trigger selector: filled when selected, outline otherwise
+                icon.isSelected = isSelected
 
-                // Optional: contentDescription update for accessibility
-                icon?.contentDescription = "${item.name.lowercase().replaceFirstChar { it.titlecase() }}${if (isSelected) " (selected)" else ""}"
+                // 2) keep tint (often white); fade others via alpha
+                if (selectedTint != null && unselectedTint != null) {
+                    icon.imageTintList = ColorStateList.valueOf(
+                        if (isSelected) selectedTint else unselectedTint
+                    )
+                }
+                icon.alpha = if (isSelected) 1f else unselectedAlpha
+
+                // accessibility
+                val label = item.name.lowercase().replaceFirstChar { it.titlecase() }
+                icon.contentDescription = "$label${if (isSelected) " (selected)" else ""}"
             }
         }
 
@@ -78,7 +88,7 @@ object BottomNavbar {
             applySelectedState(item)
             when (item) {
                 Item.HOME -> callbacks.onHome()
-                Item.ANALYTICS -> callbacks.onAnalytics()
+                Item.HISTORY -> callbacks.onHistory()
                 Item.NOTIFICATIONS -> callbacks.onNotifications()
                 Item.SETTINGS -> callbacks.onSettings()
             }
@@ -86,7 +96,7 @@ object BottomNavbar {
 
         // Hook listeners
         navHome.setOnClickListener { onClick(Item.HOME) }
-        navAnalytics.setOnClickListener { onClick(Item.ANALYTICS) }
+        navHistory.setOnClickListener { onClick(Item.HISTORY) }
         navNotifications.setOnClickListener { onClick(Item.NOTIFICATIONS) }
         navSettings.setOnClickListener { onClick(Item.SETTINGS) }
 

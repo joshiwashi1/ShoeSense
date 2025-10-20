@@ -1,9 +1,10 @@
-package com.shoesense.shoesense.changepassword
+package com.shoesense.shoesense.ChangePassword
 
 import android.app.Activity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import com.shoesense.shoesense.R
 
@@ -18,10 +19,17 @@ class ChangePasswordActivity : Activity(), ChangePasswordView.View {
         presenter = ChangePasswordPresenter(this)
 
         val oldPasswordEditText = findViewById<EditText>(R.id.oldPasswordEditText)
-        val newPasswordEditText = findViewById<EditText>(R.id.newpasswordEditText)
+        val newPasswordEditText = findViewById<EditText>(R.id.newPasswordEditText)
         val confirmNewPasswordEditText = findViewById<EditText>(R.id.confirmNewPasswordEditText)
         val confirmChangeButton = findViewById<Button>(R.id.confirmChangeButton)
+        val btnBack = findViewById<ImageButton>(R.id.btnBack)
 
+        // ✅ Back button closes the screen
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        // ✅ Confirm button triggers presenter logic
         confirmChangeButton.setOnClickListener {
             presenter.changePassword(
                 oldPasswordEditText.text.toString(),
@@ -37,6 +45,7 @@ class ChangePasswordActivity : Activity(), ChangePasswordView.View {
 
     override fun showSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        // Optionally: finish() or navigate to another screen
+        // Optionally close after success
+        // finish()
     }
 }

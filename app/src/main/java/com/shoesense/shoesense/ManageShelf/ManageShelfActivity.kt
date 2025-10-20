@@ -38,7 +38,7 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
 
     // Bottom nav (your custom bar views)
     private lateinit var navHome: View
-    private lateinit var navAnalytics: View
+    private lateinit var navHistory: View
     private lateinit var navNotifications: View
     private lateinit var navSettings: View
 
@@ -69,7 +69,7 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
         switchNotifyDefault = findViewById(R.id.switchNotifyDefault)
 
         navHome = findViewById(R.id.navHome)
-        navAnalytics = findViewById(R.id.navAnalytics)
+        navHistory = findViewById(R.id.navHistory)
         navNotifications = findViewById(R.id.navNotifications)
         navSettings = findViewById(R.id.navSettings)
 
@@ -93,7 +93,7 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
-        navAnalytics.setOnClickListener {
+        navHistory.setOnClickListener {
             Toast.makeText(this, "Analytics (coming soon)", Toast.LENGTH_SHORT).show()
         }
         navNotifications.setOnClickListener {

@@ -1,12 +1,15 @@
 package com.shoesense.shoesense.forgotpassword
 
+import ForgotPasswordPresenter
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import com.shoesense.shoesense.R
+import com.google.firebase.FirebaseApp
 
 class ForgotPasswordActivity : Activity(), ForgotPasswordView {
 
@@ -24,6 +27,7 @@ class ForgotPasswordActivity : Activity(), ForgotPasswordView {
         emailEditText = findViewById(R.id.emailEditText)
         submitButton = findViewById(R.id.submitButton)
 
+        FirebaseApp.initializeApp(this)
         // Initialize presenter
         presenter = ForgotPasswordPresenter(this)
 
@@ -39,6 +43,10 @@ class ForgotPasswordActivity : Activity(), ForgotPasswordView {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+    }
 
     // --- Callbacks from Presenter ---
     override fun closeScreen() {
@@ -46,10 +54,25 @@ class ForgotPasswordActivity : Activity(), ForgotPasswordView {
     }
 
     override fun showEmailError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
-    override fun showResetLinkSent(email: String) {
-        Toast.makeText(this, "Password reset link sent to $email", Toast.LENGTH_LONG).show()
+    override fun showResetLinkSent(message: String) {
+        runOnUiThread {
+            // ✅ Success dialog for better UX
+            AlertDialog.Builder(this)
+                .setTitle("Password Reset Email Sent")
+                .setMessage(
+                    "$message\n\nPlease check your inbox or spam folder for the reset link."
+                )
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                    finish() // optional: close screen after acknowledging
+                }
+                .setCancelable(false)
+                .show()
+        }
     }
 }

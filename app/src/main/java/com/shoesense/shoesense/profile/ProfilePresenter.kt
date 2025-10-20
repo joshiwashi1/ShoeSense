@@ -1,33 +1,40 @@
 package com.shoesense.shoesense.profile
 
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.*
 
-class ProfilePresenter(private val view: ProfileView.View) : ProfileView.Presenter {
+class ProfilePresenter(private var view: ProfileView.View?) : ProfileView.Presenter {
 
-    private val db = FirebaseFirestore.getInstance()
+    private val db: DatabaseReference =
+        FirebaseDatabase.getInstance().reference.child("users")
 
     override fun fetchUserProfile(email: String) {
-        view.showLoading(true)
+        view?.showLoading(true)
 
-        db.collection("users")
-            .whereEqualTo("email", email)
-            .get()
-            .addOnSuccessListener { documents ->
-                view.showLoading(false)
+        // Assuming RTDB structure:
+        // users/{uid or randomKey} = { "name": "...", "email": "...", "photoUrl": "..." }
+        db.orderByChild("email").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    view?.showLoading(false)
+                    if (!snapshot.hasChildren()) return
 
-                if (!documents.isEmpty) {
-                    val doc = documents.documents[0]
-                    val name = doc.getString("name") ?: "No Name"
-                    val profileUrl = doc.getString("profileUrl")
+                    // Get first match
+                    val first = snapshot.children.first()
+                    val name = first.child("name").getValue(String::class.java) ?: ""
+                    val mail = first.child("email").getValue(String::class.java) ?: email
+                    val photo = first.child("photoUrl").getValue(String::class.java)
 
-                    view.showProfile(name, email, profileUrl)
-                } else {
-                    view.showErrorMessage("Profile not found.")
+                    view?.showProfile(name, mail, photo)
                 }
-            }
-            .addOnFailureListener { e ->
-                view.showLoading(false)
-                view.showErrorMessage(e.message ?: "Failed to fetch profile.")
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                    view?.showLoading(false)
+                    view?.showErrorMessage("Failed to load profile: ${error.message}")
+                }
+            })
+    }
+
+    override fun detach() {
+        view = null
     }
 }

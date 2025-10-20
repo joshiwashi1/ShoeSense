@@ -1,4 +1,4 @@
-package com.shoesense.shoesense.changepassword
+package com.shoesense.shoesense.ChangePassword
 
 interface ChangePasswordView {
     interface View {
