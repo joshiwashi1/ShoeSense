@@ -13,38 +13,53 @@
         android:layout_height="wrap_content"
         android:padding="20dp">
 
-        <!-- Back Button (as requested, ConstraintLayout attributes) -->
+        <!-- Back Button -->
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
-            android:adjustViewBounds="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="0dp"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@+id/tvTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.044"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/button_back"
             app:tint="@android:color/black" />
 
-        <!-- Profile Image -->
-        <ImageView
-            android:id="@+id/imgProfile"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+        <!-- Profile Image Container -->
+        <FrameLayout
+            android:id="@+id/profileImageContainer"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/circle_shape"
-            android:padding="2dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/profile_icon"
             app:layout_constraintTop_toBottomOf="@id/btnBack"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Profile Image -->
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/circle_shape"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile_icon"
+                android:contentDescription="Profile Image" />
+
+            <!-- Camera Icon Overlay -->
+            <ImageView
+                android:id="@+id/btnChangeImage"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="8dp"
+                android:background="@drawable/circle_button_bg"
+                android:padding="6dp"
+                android:src="@drawable/ic_camera"
+                app:tint="@android:color/white"
+                android:contentDescription="Change Profile Picture" />
+        </FrameLayout>
 
         <!-- Title -->
         <TextView
@@ -60,10 +75,9 @@
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/imgProfile"
+            app:layout_constraintTop_toBottomOf="@id/profileImageContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
 
         <!-- Username Label -->
         <TextView

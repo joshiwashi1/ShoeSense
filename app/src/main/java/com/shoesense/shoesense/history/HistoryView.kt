@@ -1,5 +1,8 @@
 package com.shoesense.shoesense.history
 
+import com.shoesense.shoesense.Model.Slot
+
 interface HistoryView {
-    // Add view methods later (e.g., showHistoryList, showLoading, showError)
+    fun onSlotsUpdated(slots: List<Slot>)
+    fun onError(message: String)
 }

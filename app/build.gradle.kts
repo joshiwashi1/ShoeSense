@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.shoesense.shoesense"
-    compileSdk = 36
+    compileSdk = 34 // Firebase SDKs currently target 34, not 36
 
     defaultConfig {
         applicationId = "com.shoesense.shoesense"
@@ -27,32 +27,35 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
 
 dependencies {
-    // UI and core libraries
-    implementation("com.google.android.material:material:1.12.0")
+    // Core Android libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
-    // Firebase (using BOM for version alignment)
+    // ✅ Firebase (using BOM for version alignment)
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
 
-    // Glide (image loading)
+    // ✅ Glide (image loading)
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
