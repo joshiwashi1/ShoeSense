@@ -2,7 +2,9 @@ package com.shoesense.shoesense.history
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.shoesense.shoesense.Model.Slot
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.home.HomeDashboardActivity
@@ -18,8 +20,8 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
         setContentView(R.layout.activity_history)
 
         presenter = HistoryPresenter(this)
+        presenter.observeSlots(maxSlots = 10)
 
-        // ✅ Bottom navigation binding (same style as SettingsActivity)
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HISTORY,
@@ -29,9 +31,7 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
-                onHistory = {
-                    // already here — do nothing
-                },
+                onHistory = {},
                 onNotifications = {
                     startActivity(Intent(this, NotificationActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -45,5 +45,19 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
             ),
             unselectedAlpha = 0.45f
         )
+    }
+
+    override fun onSlotsUpdated(slots: List<Slot>) {
+        // Update RecyclerView or UI
+        Toast.makeText(this, "Fetched ${slots.size} slots", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onError(message: String) {
+        Toast.makeText(this, "Error: $message", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.detach()
     }
 }
