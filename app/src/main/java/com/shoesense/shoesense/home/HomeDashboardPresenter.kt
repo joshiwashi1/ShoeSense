@@ -11,6 +11,9 @@ class HomeDashboardPresenter(private val ctx: Context) {
     private val maxSlots = 12
     private var observing = false
 
+    // NEW: keep the latest snapshot so we can compute canAddMore()
+    private var latestSlots: List<Slot> = emptyList()
+
     fun attach(v: HomeDashboardView) {
         view = v
         if (!observing) observe()
@@ -32,6 +35,9 @@ class HomeDashboardPresenter(private val ctx: Context) {
         repo.observeSlots(
             maxSlots = maxSlots,
             onUpdate = { slots ->
+                // NEW: cache
+                latestSlots = slots
+
                 val rows = buildRows(slots)
                 view?.render(rows)
             },
@@ -45,6 +51,10 @@ class HomeDashboardPresenter(private val ctx: Context) {
     }
 
     fun nextSlotNumber(): Int = repo.nextSlotNumber(maxSlots)
+
+    // NEW: used by Activity before launching Add in CREATE mode
+    fun canAddMore(): Boolean = latestSlots.size < maxSlots
+
     fun onAddClicked() = view?.openAddSlot()
     fun onSlotClicked(s: Slot) = view?.openSlotDetail(s)
 }

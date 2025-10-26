@@ -1,22 +1,22 @@
 package com.shoesense.shoesense.AddSlot
 
-import android.app.Activity
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.slider.Slider
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.slider.Slider
 import com.shoesense.shoesense.R
 
 class AddSlotActivity : AppCompatActivity(), AddSlotView {
 
     companion object {
-        const val EXTRA_SLOT_NUMBER = "slot_number"   // 1-based index you pass in from Home
-        const val RESULT_SAVED = 1001                 // optional result code to trigger refresh
+        const val EXTRA_SLOT_NUMBER = "slot_number"   // for edit mode (1-based)
+        const val EXTRA_IS_EDIT = "is_edit"           // NEW: false = create, true = edit
+        const val RESULT_SAVED = 1001
     }
 
     private lateinit var presenter: AddSlotPresenter
@@ -30,13 +30,17 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
     private lateinit var btnBack: ImageButton
 
     private var slotNumber: Int = 1
+    private var isEdit: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_slot) // your XML file name
+        setContentView(R.layout.activity_add_slot)
 
+        // Read intent
+        isEdit = intent.getBooleanExtra(EXTRA_IS_EDIT, false)
         slotNumber = intent.getIntExtra(EXTRA_SLOT_NUMBER, 1)
 
+        // Bind
         tvSlotLabel = findViewById(R.id.tvSlotLabel)
         tvThresholdValue = findViewById(R.id.tvThresholdValue)
         slider = findViewById(R.id.sliderThreshold)
@@ -45,14 +49,15 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
         btnCancel = findViewById(R.id.btnCancel)
         btnBack = findViewById(R.id.btnBack)
 
-        tvSlotLabel.text = "Slot $slotNumber"
+        tvSlotLabel.text = if (isEdit) "Slot $slotNumber" else "New Slot"
 
         presenter = AddSlotPresenter(this, this)
-        presenter.load(slotNumber)
+        presenter.load(slotNumber, isEdit)
 
+        // Display slider value live
         slider.addOnChangeListener { _, value, _ ->
             tvThresholdValue.text = String.format("%.1f kg", value)
-            presenter.setThreshold(slotNumber, value)
+            presenter.setThreshold(slotNumber, value) // local prefs cache
         }
 
         btnAddSlotName.setOnClickListener {
@@ -70,21 +75,31 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
         }
 
         btnAddSlot.setOnClickListener {
-            presenter.save(slotNumber)
-            setResult(RESULT_SAVED)
+            if (isEdit) {
+                // Update existing slotN
+                presenter.updateExisting(slotNumber)
+            } else {
+                // Create: push a brand-new child (auto id) and assign next index
+                presenter.createNew()
+            }
         }
 
         btnCancel.setOnClickListener { finish() }
         btnBack.setOnClickListener { finish() }
     }
 
-    // --- AddSlotView ---
+    // --- AddSlotView impl ---
     override fun showName(name: String) {
-        // reflect chosen name under the big button label if you want
         btnAddSlotName.text = if (name.isBlank()) "Add Slot Name" else name
     }
 
     override fun showThreshold(value: Float) {
+        // Set slider range if you haven’t in XML:
+        if (slider.valueFrom == 0f && slider.valueTo == 0f) {
+            slider.valueFrom = 0f
+            slider.valueTo = 5.0f   // e.g., up to 5 kg; adjust to your load cell
+            slider.stepSize = 0.1f  // 100 g steps on UI (we still snap to 10 g at save)
+        }
         slider.value = value
         tvThresholdValue.text = String.format("%.1f kg", value)
     }
@@ -93,11 +108,10 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    override fun closeScreen() {
+    override fun closeScreen() { finish() }
+
+    override fun onSaved() {
+        setResult(RESULT_SAVED)
         finish()
     }
-    override fun onSaved() {
-        setResult(AddSlotActivity.RESULT_SAVED)
-    }
-
 }

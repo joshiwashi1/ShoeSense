@@ -13,8 +13,6 @@ import com.shoesense.shoesense.R
 import com.shoesense.shoesense.AddSlot.AddSlotActivity
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
-import com.shoesense.shoesense.history.HistoryActivity
-import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
 class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
@@ -42,8 +40,7 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
         // --- bind Overview counters ---
         tvActiveSlots = findViewById(R.id.tvActiveSlots)
-        // NOTE: XML id is tvNotifications but the label is "Empty Slots"
-        // (feel free to rename the id in XML to tvEmptySlots later)
+        // NOTE: XML id is tvNotifications but label is "Empty Slots"
         tvEmptySlots = findViewById(R.id.tvNotifications)
         tvTotalSlots = findViewById(R.id.tvTotalSlots)
 
@@ -57,34 +54,26 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         rv.adapter = adapter
 
         // --- bottom nav ---
-        // --- bottom nav hookup (AFTER setContentView) ---
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
             callbacks = BottomNavbar.Callbacks(
-                onHome = {
-                    // already here — just scroll to top
-                    rv.smoothScrollToPosition(0)
-                },
+                onHome = { rv.smoothScrollToPosition(0) },
                 onHistory = {
-                    // TODO: start AnalyticsActivity
-                    // startActivity(Intent(this, AnalyticsActivity::class.java))
+                    // startActivity(Intent(this, HistoryActivity::class.java))
                     // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 },
                 onNotifications = {
-                    // TODO: start NotificationsActivity
-                    // startActivity(Intent(this, NotificationsActivity::class.java))
+                    // startActivity(Intent(this, NotificationActivity::class.java))
                     // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 },
                 onSettings = {
                     startActivity(Intent(this, SettingsActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                    // don't finish() so Back returns to Home
                 }
             ),
-            // same visual rules as Settings: selected=solid white, others faded
-            selectedTint   = resources.getColor(android.R.color.white, theme),
-            unselectedTint = resources.getColor(android.R.color.white, theme),
+            selectedTint   = ContextCompat.getColor(this, android.R.color.white),
+            unselectedTint = ContextCompat.getColor(this, android.R.color.white),
             unselectedAlpha = 0.35f
         )
 
@@ -104,7 +93,6 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         if (!::adapter.isInitialized) return
         adapter.submitList(items)
 
-        // derive counts from what we actually render
         val dataRows = items.filterIsInstance<SlotRow.Data>()
         val total = dataRows.size
         val active = dataRows.count { it.slot.occupied }
@@ -116,13 +104,15 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun openAddSlot() {
-        val slotNum = presenter.nextSlotNumber()
-        if (slotNum <= 0) {
+        // Prefer a boolean guard; if you must keep nextSlotNumber(), treat <=0 as "no space"
+        val canAdd = presenter.canAddMore()
+        if (!canAdd) {
             showError("Maximum of 12 slots reached.")
             return
         }
+
         val intent = Intent(this, AddSlotActivity::class.java)
-            .putExtra(AddSlotActivity.EXTRA_SLOT_NUMBER, slotNum)
+            .putExtra(AddSlotActivity.EXTRA_IS_EDIT, false) // CREATE mode
         refreshLauncher.launch(intent)
     }
 
@@ -133,12 +123,13 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
             putExtra("occupied", slot.occupied)
             putExtra("last_updated", slot.lastUpdated)
         }
-        refreshLauncher.launch(intent)
+        startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     override fun showError(message: String) {
-        // Toast/Snackbar if desired
+        // TODO: Toast or Snackbar
+        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {

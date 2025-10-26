@@ -67,7 +67,7 @@
                 android:id="@+id/tvSlotLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Slot 6"
+                android:text="Shoe Slot"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:textSize="25sp"
