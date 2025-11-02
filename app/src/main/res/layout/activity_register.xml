@@ -20,16 +20,6 @@
         android:textAlignment="center"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp" />
-
-    <!-- Sub Text -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Complete the fields below, or click login here if you’ve registered before"
-        android:textSize="13sp"
-        android:gravity="center"
-        android:layout_marginBottom="16dp" />
-
     <!-- Section Intro -->
     <TextView
         android:layout_width="match_parent"
@@ -38,7 +28,7 @@
         android:textSize="19sp"
         android:textStyle="bold"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="5dp" />
 
     <!-- Name -->
     <TextView
@@ -111,6 +101,39 @@
         android:background="@drawable/createaccountedittext_border"
         android:padding="12dp" />
 
+    <!-- ========= JOIN SITE (Invite Code) ========= -->
+    <TextView
+        android:id="@+id/joinSiteLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Join Site"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="6dp" />
+
+    <TextView
+        android:id="@+id/joinSiteHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter the site code from your ShoeSlot site."
+        android:textSize="12sp"
+        android:textColor="#7A7A7A"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/inviteCodeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:hint="Invite code (required)"
+        android:inputType="textCapCharacters"
+        android:maxLength="16"
+        android:background="@drawable/createaccountedittext_border"
+        android:textSize="15sp"
+        android:padding="12dp"
+        android:importantForAutofill="no"
+        android:autofillHints="" />
+
     <!-- Terms and Conditions -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -150,29 +173,33 @@
         android:backgroundTint="@color/yellow" />
 
     <!-- Already have account -->
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:text="Already have an Account?"
-        android:textStyle="bold"
-        android:textSize="14sp" />
+        android:layout_marginTop="12dp">
 
-    <!-- Login Button -->
-    <Button
-        android:id="@+id/loginhereButton"
-        android:layout_width="220dp"
-        android:layout_height="42dp"
-        android:text="Login here"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="14sp"
-        android:background="@drawable/loginhere_border"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already have an account? "
+            android:textSize="14sp"
+            android:textColor="@color/black" />
 
-    <!-- ✅ Add this ProgressBar at the end -->
+        <TextView
+            android:id="@+id/loginhereTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login Here"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/blue_main"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- ProgressBar -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="48dp"
@@ -180,5 +207,4 @@
         android:layout_gravity="center"
         android:visibility="gone"
         android:layout_marginTop="16dp" />
-
 </LinearLayout>

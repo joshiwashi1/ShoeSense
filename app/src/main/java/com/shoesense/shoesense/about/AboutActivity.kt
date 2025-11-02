@@ -28,14 +28,21 @@ class AboutActivity : AppCompatActivity(), AboutView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide the AppCompat ActionBar (if your theme still shows one)
+        supportActionBar?.hide()
+        // Hide the STATUS BAR (not the nav bar)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_about)
 
+        // 🔹 Make sure views exist before you use them
         bindViews()
 
-        // Attach shared BottomNavbar
+        // Now it's safe to use btnBack
+        btnBack.setOnClickListener { finish() }
+
+        // Attach navbar AFTER contentView and views are ready
         BottomNavbar.attach(
             activity = this,
-            // About is typically reached from Settings, so highlight Settings by default
             defaultSelected = BottomNavbar.Item.SETTINGS,
             callbacks = BottomNavbar.Callbacks(
                 onHome = {
@@ -43,18 +50,9 @@ class AboutActivity : AppCompatActivity(), AboutView {
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
-                onHistory = {
-                    // startActivity(Intent(this, AnalyticsActivity::class.java))
-                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                    // finish()
-                },
-                onNotifications = {
-                    // startActivity(Intent(this, NotificationsActivity::class.java))
-                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                    // finish()
-                },
+                onHistory = { /* ... */ },
+                onNotifications = { /* ... */ },
                 onSettings = {
-                    // If you prefer to return to the Settings screen:
                     startActivity(Intent(this, SettingsActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
@@ -63,13 +61,12 @@ class AboutActivity : AppCompatActivity(), AboutView {
             unselectedAlpha = 0.45f
         )
 
-        btnBack.setOnClickListener { finish() }
-
         presenter = AboutPresenter().also {
             it.attach(this)
             it.loadAbout()
         }
     }
+
 
     private fun bindViews() {
         // Top

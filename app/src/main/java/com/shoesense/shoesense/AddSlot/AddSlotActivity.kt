@@ -34,6 +34,10 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide the ActionBar (if theme shows one)
+        actionBar?.hide()
+        // Hide the STATUS BAR (not nav bar)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_add_slot)
 
         // Read intent

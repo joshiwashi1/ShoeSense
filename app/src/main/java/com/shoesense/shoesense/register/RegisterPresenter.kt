@@ -4,6 +4,7 @@ import android.util.Patterns
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
+import com.shoesense.shoesense.Repository.AppConfig
 
 class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Presenter {
 
@@ -14,7 +15,8 @@ class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Pres
         name: String,
         email: String,
         password: String,
-        confirmPassword: String
+        confirmPassword: String,
+        siteCode: String
     ) {
         // === VALIDATION ===
         if (name.isBlank()) { view.showNameError("Name cannot be empty"); return }
@@ -26,8 +28,39 @@ class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Pres
         if (confirmPassword.isBlank()) { view.showConfirmPasswordError("Confirm Password cannot be empty"); return }
         if (confirmPassword != password) { view.showConfirmPasswordError("Passwords do not match"); return }
 
-        // === CREATE AUTH ACCOUNT (enforces unique emails) ===
+        if (siteCode.isBlank()) {
+            view.showErrorMessage("Enter your site code.")
+            return
+        }
+
+        // ✅ Normalize to lowercase — all site IDs stored this way
+        val siteId = siteCode.trim().lowercase()
+
+        // === Check if site exists before proceeding ===
         view.showLoading(true)
+        rtdb.child("sites").child(siteId).get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.exists()) {
+                    view.showLoading(false)
+                    view.showErrorMessage("Site '$siteId' does not exist. Please enter a valid site code.")
+                    return@addOnSuccessListener
+                }
+
+                // Site exists — proceed to create Auth user
+                createAccountAndJoinSite(name, email, password, siteId)
+            }
+            .addOnFailureListener { e ->
+                view.showLoading(false)
+                view.showErrorMessage("Unable to verify site: ${e.message}")
+            }
+    }
+
+    private fun createAccountAndJoinSite(
+        name: String,
+        email: String,
+        password: String,
+        siteId: String
+    ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -50,27 +83,40 @@ class RegisterPresenter(private val view: RegisterView.View) : RegisterView.Pres
                     .build()
                 user.updateProfile(profileUpdates)
 
-                // Optional: send verification email
-                // user.sendEmailVerification()
-
-                // === SAVE PUBLIC PROFILE IN REALTIME DATABASE (NO PASSWORD) ===
+                // === SAVE PROFILE IN DATABASE ===
+                val now = System.currentTimeMillis()
                 val userDoc = mapOf(
                     "uid" to uid,
                     "name" to name,
                     "email" to email,
-                    "createdAt" to System.currentTimeMillis()
+                    "createdAt" to now
                 )
 
                 rtdb.child("users").child(uid)
                     .setValue(userDoc)
                     .addOnSuccessListener {
-                        view.showLoading(false)
-                        view.showSuccessMessage("Sign-up successful!")
-                        view.navigateToLogin()
+                        // === JOIN EXISTING SITE (all lowercase) ===
+                        val updates = hashMapOf<String, Any>(
+                            "users/$uid/sites/$siteId" to "member",
+                            "siteMembers/$siteId/$uid" to mapOf(
+                                "role" to AppConfig.DEFAULT_ROLE,
+                                "joinedAt" to now
+                            )
+                        )
+                        rtdb.updateChildren(updates)
+                            .addOnSuccessListener {
+                                // Save globally for later
+                                AppConfig.siteId = siteId
+                                view.showLoading(false)
+                                view.showSuccessMessage("Sign-up successful! Joined site: $siteId")
+                                view.navigateToLogin()
+                            }
+                            .addOnFailureListener { e ->
+                                view.showLoading(false)
+                                view.showErrorMessage("Failed to join site: ${e.message}")
+                            }
                     }
                     .addOnFailureListener { e ->
-                        // If you want to be strict, you could delete the just-created Auth user here.
-                        // user.delete()
                         view.showLoading(false)
                         view.showErrorMessage("Failed to save profile: ${e.message}")
                     }

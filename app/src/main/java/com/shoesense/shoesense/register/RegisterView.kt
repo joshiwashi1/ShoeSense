@@ -10,8 +10,6 @@ interface RegisterView {
         fun showSuccessMessage(msg: String)
         fun showErrorMessage(msg: String)
         fun navigateToLogin()
-
-        // 👇 add these 2 lines
         fun showLoading(isLoading: Boolean)
     }
 
@@ -20,7 +18,8 @@ interface RegisterView {
             name: String,
             email: String,
             password: String,
-            confirmPassword: String
+            confirmPassword: String,
+            siteCode: String   // ✅ added this parameter
         )
     }
 }

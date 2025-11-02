@@ -1,4 +1,3 @@
-// app/src/main/java/com/shoesense/shoesense/register/RegisterActivity.kt
 package com.shoesense.shoesense.register
 
 import android.app.Activity
@@ -19,11 +18,15 @@ class RegisterActivity : Activity(), RegisterView.View {
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
     private lateinit var signUpButton: Button
-    private lateinit var loginHereButton: Button
+    private lateinit var loginHereTextView: TextView
     private var progressBar: ProgressBar? = null   // optional if not in XML
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide the ActionBar (if theme shows one)
+        actionBar?.hide()
+        // Hide the STATUS BAR (not nav bar)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_register)
 
         presenter = RegisterPresenter(this)
@@ -33,8 +36,10 @@ class RegisterActivity : Activity(), RegisterView.View {
         passwordEditText = findViewById(R.id.passwordEditText)
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText)
         signUpButton = findViewById(R.id.signUpButton)
-        loginHereButton = findViewById(R.id.loginhereButton)
-        // If your XML has a ProgressBar with this id, we'll use it. Otherwise it's just null-safe.
+
+        // ⚠️ changed from Button to minimal TextView link
+        loginHereTextView = findViewById(R.id.loginhereTextView)
+
         progressBar = findViewById(R.id.progressBar)
 
         signUpButton.setOnClickListener {
@@ -42,10 +47,15 @@ class RegisterActivity : Activity(), RegisterView.View {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
-            presenter.onCreateAccountClicked(name, email, password, confirmPassword)
+
+            val inviteCodeEditText = findViewById<EditText>(R.id.inviteCodeEditText)
+            val siteCode = inviteCodeEditText.text.toString().trim().lowercase()
+
+            presenter.onCreateAccountClicked(name, email, password, confirmPassword, siteCode)
         }
 
-        loginHereButton.setOnClickListener {
+
+        loginHereTextView.setOnClickListener {
             navigateToLogin()
         }
     }
@@ -74,7 +84,7 @@ class RegisterActivity : Activity(), RegisterView.View {
 
     override fun showSuccessMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        // Presenter will call navigateToLogin() separately; we avoid double navigation here.
+        // Presenter will call navigateToLogin() separately
     }
 
     override fun showErrorMessage(message: String) {
@@ -89,7 +99,7 @@ class RegisterActivity : Activity(), RegisterView.View {
     override fun showLoading(isLoading: Boolean) {
         progressBar?.visibility = if (isLoading) View.VISIBLE else View.GONE
         signUpButton.isEnabled = !isLoading
-        loginHereButton.isEnabled = !isLoading
+        loginHereTextView.isEnabled = !isLoading
         nameEditText.isEnabled = !isLoading
         emailEditText.isEnabled = !isLoading
         passwordEditText.isEnabled = !isLoading
