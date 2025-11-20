@@ -1,5 +1,7 @@
 package com.shoesense.shoesense.Repository
 
+import com.google.firebase.auth.FirebaseAuth
+
 /**
  * Shared configuration and runtime variables used across the app.
  */
@@ -17,14 +19,17 @@ object AppConfig {
     const val DEFAULT_ROLE = "member"
 
     /**
-     * Root node in Firebase Realtime Database.
-     */
-    const val FIREBASE_ROOT = "sites"
-
-    /**
      * Helper function: safely return a non-null siteId or throw an error.
      */
     fun requireSiteId(): String {
         return siteId ?: throw IllegalStateException("siteId not set. Make sure user joined a site first.")
+    }
+
+    /**
+     * Get current user ID safely
+     */
+    fun requireUserId(): String {
+        return FirebaseAuth.getInstance().currentUser?.uid
+            ?: throw IllegalStateException("User not logged in")
     }
 }
