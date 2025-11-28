@@ -7,20 +7,27 @@ import java.util.TimeZone
 
 class SlotDetailPresenter(private val view: SlotDetailView) {
 
+    private var siteId: String = ""
     private var slotId: String = ""
     private var ref: DatabaseReference? = null
     private var listener: ValueEventListener? = null
 
-    // local shadow state
     private var slotName: String = "Slot"
-    private var status: String = "Empty"      // "Occupied" / "Empty"
-    private var notifEnabled: Boolean = false
-    private var thresholdGrams: Int = 500     // store in grams for UI; DB keeps kg (Double)
+    private var status: String = "Empty"
+    private var notifEnabled: Boolean = false      // you can use this later if you add it to DB
+    private var thresholdGrams: Int = 500
     private var lastUpdatedIso: String? = null
 
-    fun attach(slotId: String) {
+    fun attach(siteId: String, slotId: String) {
+        this.siteId = siteId
         this.slotId = slotId
-        ref = FirebaseDatabase.getInstance().reference.child("slots").child(slotId)
+
+        // ✅ EXACT PATH: /shoe_slots/{siteId}/{slotId}
+        ref = FirebaseDatabase.getInstance().reference
+            .child("shoe_slots")
+            .child(siteId)
+            .child(slotId)
+
         startObserving()
     }
 
@@ -30,20 +37,28 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
         ref = null
     }
 
-    // ------------------ Observe live ------------------
     private fun startObserving() {
         stopObserving()
         val r = ref ?: return
+
         listener = object : ValueEventListener {
             override fun onDataChange(snap: DataSnapshot) {
-                // name
-                slotName = (snap.child("name").value as? String)?.ifBlank { slotId } ?: slotId
+                if (!snap.exists()) {
+                    view.showToast("Slot not found")
+                    view.navigateBack()
+                    return
+                }
 
-                // status: prefer string field "status" ("occupied"/"empty")
-                val statusStr = (snap.child("status").value as? String)?.lowercase(Locale.getDefault())
+                // name
+                slotName = (snap.child("name").getValue(String::class.java)
+                    ?: slotId).ifBlank { slotId }
+
+                // status from "status": "occupied"/"empty"
+                val statusStr = (snap.child("status").getValue(String::class.java)
+                    ?: "empty").lowercase(Locale.getDefault())
                 status = if (statusStr == "occupied") "Occupied" else "Empty"
 
-                // threshold (kg Double) -> grams Int for UI/editor
+                // threshold (kg -> g)
                 val thKg = when (val v = snap.child("threshold").value) {
                     is Number -> v.toDouble()
                     is String -> v.toDoubleOrNull() ?: 0.0
@@ -51,23 +66,21 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
                 }
                 thresholdGrams = (thKg * 1000).toInt()
 
-                // last updated (ISO string)
-                lastUpdatedIso = (snap.child("last_updated").value as? String)
+                // last_updated
+                lastUpdatedIso = snap.child("last_updated").getValue(String::class.java)
 
-                // Render
+                // render
                 view.showSlotName(slotName)
                 view.showStatus(status)
-                val occAt = if (status == "Occupied") lastUpdatedIso?.let { isoToLocalClock(it) } else null
-                val empAt = if (status == "Empty") lastUpdatedIso?.let { isoToLocalClock(it) } else null
+
+                val occAt = if (status == "Occupied")
+                    lastUpdatedIso?.let { isoToLocalClock(it) } else null
+                val empAt = if (status == "Empty")
+                    lastUpdatedIso?.let { isoToLocalClock(it) } else null
+
                 view.showTimeline(occAt, empAt)
 
-                // notifications (optional field)
-                notifEnabled = when (val v = snap.child("notif_enabled").value) {
-                    is Boolean -> v
-                    is Number -> v.toInt() != 0
-                    is String -> v.equals("true", true) || v == "1"
-                    else -> false
-                }
+                // (notifEnabled not in your DB yet; default false)
                 view.setNotificationsEnabled(notifEnabled)
             }
 
@@ -75,6 +88,7 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
                 view.showToast("Load failed: ${error.message}")
             }
         }
+
         r.addValueEventListener(listener as ValueEventListener)
     }
 
@@ -83,11 +97,11 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
         listener = null
     }
 
-    // ------------------ UI reads ------------------
+    // --- Public getters for Activity ---
     fun getSlotName(): String = slotName
     fun getThresholdGrams(): Int = thresholdGrams
 
-    // ------------------ Actions ------------------
+    // --- Actions ---
     fun onBackClicked() = view.navigateBack()
 
     fun onRenameClicked() {
@@ -126,7 +140,6 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
         view.showToast("Threshold set to ${newValueGrams}g")
     }
 
-    // --------------- Helpers ---------------
     private fun write(payload: Map<String, Any>) {
         ref?.updateChildren(payload)
             ?.addOnFailureListener { e -> view.showToast("Save failed: ${e.message}") }

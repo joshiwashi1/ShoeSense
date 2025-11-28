@@ -174,7 +174,7 @@ class SlotRepository(private val ctx: Context) {
         val id = key ?: return null
         val name = getStringFlex("name") ?: id.capitalizeSlot()
 
-        // read both forms for compatibility
+        // read values
         val threshold = getDoubleFlex("threshold") ?: 0.0
         val weight = getDoubleFlex("current_weight") ?: getDoubleFlex("currentWeight") ?: 0.0
 
@@ -182,12 +182,12 @@ class SlotRepository(private val ctx: Context) {
         val statusValue = getStringFlex("status")?.lowercase(Locale.getDefault())
         val manualOccupied = statusValue == "occupied"
 
-        // hysteresis buffer (50 g) to reduce flicker
+        // hysteresis to reduce flicker (50g)
         val bufferKg = 0.05
         val autoOccupied = weight >= (threshold - bufferKg)
 
-        // precedence: if we have a weight, trust it; otherwise manual status
-        val occupied = if (weight > 0) autoOccupied else manualOccupied
+        // 🔥 always trust weight-based detection (0 should also mean empty)
+        val occupied = autoOccupied
 
         val lastUpdated = getStringFlex("last_updated")
             ?: getStringFlex("lastUpdated")
@@ -196,18 +196,16 @@ class SlotRepository(private val ctx: Context) {
         val lastUpdatedBy = getStringFlex("last_updated_by") ?: "unknown"
         val createdBy = getStringFlex("created_by") ?: "unknown"
 
-        // OPTIONAL: mirror computed state back to DB only when it changes, to keep status readable
-        if (weight > 0 && (manualOccupied != autoOccupied)) {
-            // write only if different to avoid loops
+        // 🔥 Mirror back status when different (even when weight = 0)
+        if (manualOccupied != autoOccupied) {
             try {
-                getDatabaseReference().child(id)
-                    .updateChildren(
-                        mapOf(
-                            "status" to if (autoOccupied) "occupied" else "empty",
-                            "last_updated" to isoNow(),
-                            "last_updated_by" to (auth.currentUser?.uid ?: "unknown")
-                        )
+                getDatabaseReference().child(id).updateChildren(
+                    mapOf(
+                        "status" to if (autoOccupied) "occupied" else "empty",
+                        "last_updated" to isoNow(),
+                        "last_updated_by" to (auth.currentUser?.uid ?: "unknown")
                     )
+                )
             } catch (_: Exception) { /* ignore */ }
         }
 
@@ -223,6 +221,7 @@ class SlotRepository(private val ctx: Context) {
             createdBy = createdBy
         )
     }
+
 
     // -------- Flexible getters that never crash on type mismatch --------
     private fun DataSnapshot.getStringFlex(vararg keys: String, default: String? = null): String? {

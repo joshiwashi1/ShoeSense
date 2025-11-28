@@ -3,6 +3,7 @@ package com.shoesense.shoesense.home
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -11,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shoesense.shoesense.Model.Slot
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.AddSlot.AddSlotActivity
+import com.shoesense.shoesense.Repository.AppConfig
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
 import com.shoesense.shoesense.settings.SettingsActivity
+
 
 class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
@@ -121,15 +124,17 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun openSlotDetail(slot: Slot) {
+        val siteId = AppConfig.siteId ?: "home001"   // or your real current site
+
         val intent = Intent(this, SlotDetailActivity::class.java).apply {
-            putExtra("slot_id", slot.id)
-            putExtra("slot_name", slot.name)
-            putExtra("occupied", slot.occupied)
-            putExtra("last_updated", slot.lastUpdated)
+            putExtra("slot_id", slot.id)    // e.g. "slot1"
+            putExtra("site_id", siteId)     // e.g. "home001"
         }
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
+
+
 
     override fun showError(message: String) {
         // TODO: Toast or Snackbar
