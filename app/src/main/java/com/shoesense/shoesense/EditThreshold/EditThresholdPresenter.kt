@@ -10,7 +10,11 @@ class EditThresholdPresenter(
     private val view: EditThresholdView,
     private val slotId: String
 ) {
-    private val db = FirebaseDatabase.getInstance().reference.child("slots")
+
+    // Same path as before
+    private val db = FirebaseDatabase.getInstance()
+        .reference
+        .child("slots")
 
     private val minG = 0
     private val maxG = 1000
@@ -21,22 +25,25 @@ class EditThresholdPresenter(
 
     fun onInit(initialSlotName: String?, initialThresholdG: Int?) {
         initialSlotName?.let { slotName = it }
-        // ✅ clamp + snap the incoming value so it always matches stepSize(10)
+
+        // Clamp + snap initial value (if provided)
         initialThresholdG?.let {
             val clamped = clampToRange(it)
-            thresholdGrams = snapToStep(clamped)   // <--- important
+            thresholdGrams = snapToStep(clamped)
         }
-        // ✅ also normalize the default (if no extra passed)
+
+        // Normalize default if nothing was passed
         thresholdGrams = snapToStep(clampToRange(thresholdGrams))
 
         view.renderTitle(slotName)
-        view.renderThresholdKgText(formatKg(thresholdGrams))
+        view.renderThresholdKgText(formatG(thresholdGrams))
     }
 
     fun onSliderChanged(value: Float) {
-        val snapped = snapToStep(value.toInt())      // already snaps
+        // Slider gives float; we keep it as snapped integer grams
+        val snapped = snapToStep(value.toInt())
         thresholdGrams = clampToRange(snapped)
-        view.renderThresholdKgText(formatKg(thresholdGrams))
+        view.renderThresholdKgText(formatG(thresholdGrams))
     }
 
     fun onSaveClicked() {
@@ -45,7 +52,8 @@ class EditThresholdPresenter(
             view.closeWithoutResult()
             return
         }
-        // ✅ double-ensure normalization before saving
+
+        // Safety: normalize again before saving
         thresholdGrams = snapToStep(clampToRange(thresholdGrams))
         saveToFirebase(thresholdGrams)
     }
@@ -53,18 +61,17 @@ class EditThresholdPresenter(
     fun onCancelClicked() = view.closeWithoutResult()
     fun onBackClicked() = view.closeWithoutResult()
 
-    // --- Save to Firebase ---
+    // --- Save to Firebase (integer grams) ---
     private fun saveToFirebase(grams: Int) {
-        val thresholdKg = grams / 1000.0
-        val isoNow = isoNow()
+        val nowIso = isoNow()
         val payload = mapOf(
-            "threshold" to thresholdKg,
-            "last_updated" to isoNow
+            "threshold" to grams,      // store integer grams
+            "last_updated" to nowIso
         )
 
         db.child(slotId).updateChildren(payload)
             .addOnSuccessListener {
-                view.showToast("Threshold updated to ${formatKg(grams)}")
+                view.showToast("Threshold updated to ${formatG(grams)}")
                 view.closeWithResult(grams)
             }
             .addOnFailureListener { e ->
@@ -73,24 +80,22 @@ class EditThresholdPresenter(
     }
 
     // --- Helpers ---
+
     private fun isoNow(): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
         sdf.timeZone = TimeZone.getTimeZone("UTC")
         return sdf.format(System.currentTimeMillis())
     }
 
-    private fun clampToRange(v: Int) = v.coerceIn(minG, maxG)
+    private fun clampToRange(v: Int): Int = v.coerceIn(minG, maxG)
 
     private fun snapToStep(v: Int): Int {
         if (stepG <= 1) return v
-        val steps = (v.toFloat() / stepG).roundToInt()  // nearest multiple of 10
+        val steps = (v.toFloat() / stepG).roundToInt()
         return steps * stepG
     }
 
-    private fun formatKg(grams: Int): String {
-        val kg = grams / 1000f
-        return String.format("%.1f kg", kg)
-    }
+    private fun formatG(grams: Int): String = "$grams g"
 
     fun minG() = minG.toFloat()
     fun maxG() = maxG.toFloat()

@@ -31,18 +31,11 @@ class EditThresholdActivity : AppCompatActivity(), EditThresholdView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the AppCompat ActionBar (if your theme still shows one)
-        actionBar?.hide()
-        // Hide the STATUS BAR (not the nav bar)
+        supportActionBar?.hide()
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_edit_threshold)
 
-        tvTitle = findViewById(R.id.tvTitle)
-        tvThresholdValue = findViewById(R.id.tvThresholdValue)
-        slider = findViewById(R.id.sliderThreshold)
-        btnSave = findViewById(R.id.btnSave)
-        btnCancel = findViewById(R.id.btnCancel)
-        btnBack = findViewById(R.id.btnBack)
+        bindViews()
 
         val slotId = intent.getStringExtra(EXTRA_SLOT_ID) ?: ""
         val slotName = intent.getStringExtra(EXTRA_SLOT_NAME) ?: "Slot"
@@ -56,34 +49,28 @@ class EditThresholdActivity : AppCompatActivity(), EditThresholdView {
 
         presenter = EditThresholdPresenter(this, slotId)
 
-        // --- Configure slider ---
-        slider.valueFrom = presenter.minG()
-        slider.valueTo = presenter.maxG()
-        slider.stepSize = presenter.stepG()
+        // --- Configure slider for GRAMS ---
+        slider.valueFrom = 0f
+        slider.valueTo = 1000f
+        slider.stepSize = 10f  // integer increments of 10g
 
-        val min = presenter.minG().toInt()
-        val max = presenter.maxG().toInt()
-        val step = presenter.stepG().toInt()
-        val clamped = currentG.coerceIn(min, max)
-        val snapped = ((clamped + step / 2) / step) * step
+        val clamped = currentG.coerceIn(0, 1000)
+        val snapped = ((clamped + 5) / 10) * 10 // snap to nearest 10g
 
-        // ✅ Format the label (tooltip) as kg, e.g. “0.55”
+        // 🔥 Label now shows grams only (integer)
         slider.setLabelFormatter { value ->
-            String.format("%.2f", value / 1000f)
+            "${value.toInt()} g"
         }
 
         slider.post {
-            try {
-                slider.value = snapped.toFloat()
-            } catch (_: Exception) {
-                slider.value = 500f
-            }
+            slider.value = snapped.toFloat()
         }
 
         presenter.onInit(slotName, snapped)
 
+        // Apply updated value live
         slider.addOnChangeListener { _, value, _ ->
-            presenter.onSliderChanged(value)
+            presenter.onSliderChanged(value.toInt().toFloat())  // enforce integer
         }
 
         btnSave.setOnClickListener { presenter.onSaveClicked() }
@@ -91,10 +78,24 @@ class EditThresholdActivity : AppCompatActivity(), EditThresholdView {
         btnBack.setOnClickListener { presenter.onBackClicked() }
     }
 
-    // ===== EditThresholdView =====
-    override fun renderTitle(slotName: String) { tvTitle.text = slotName }
+    private fun bindViews() {
+        tvTitle = findViewById(R.id.tvTitle)
+        tvThresholdValue = findViewById(R.id.tvThresholdValue)
+        slider = findViewById(R.id.sliderThreshold)
+        btnSave = findViewById(R.id.btnSave)
+        btnCancel = findViewById(R.id.btnCancel)
+        btnBack = findViewById(R.id.btnBack)
+    }
 
-    override fun renderThresholdKgText(kgText: String) { tvThresholdValue.text = kgText }
+    // ===== EditThresholdView =====
+
+    override fun renderTitle(slotName: String) {
+        tvTitle.text = slotName
+    }
+
+    override fun renderThresholdKgText(kgText: String) {
+        tvThresholdValue.text = kgText   // presenter sends "xxx g"
+    }
 
     override fun closeWithResult(thresholdGrams: Int) {
         val data = Intent().apply { putExtra(RESULT_THRESHOLD_G, thresholdGrams) }

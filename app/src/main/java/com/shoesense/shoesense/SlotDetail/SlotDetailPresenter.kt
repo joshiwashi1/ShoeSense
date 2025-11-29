@@ -14,7 +14,7 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
 
     private var slotName: String = "Slot"
     private var status: String = "Empty"
-    private var notifEnabled: Boolean = false      // you can use this later if you add it to DB
+    private var notifEnabled: Boolean = false
     private var thresholdGrams: Int = 500
     private var lastUpdatedIso: String? = null
 
@@ -22,7 +22,7 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
         this.siteId = siteId
         this.slotId = slotId
 
-        // ✅ EXACT PATH: /shoe_slots/{siteId}/{slotId}
+        // /shoe_slots/{siteId}/{slotId}
         ref = FirebaseDatabase.getInstance().reference
             .child("shoe_slots")
             .child(siteId)
@@ -58,13 +58,13 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
                     ?: "empty").lowercase(Locale.getDefault())
                 status = if (statusStr == "occupied") "Occupied" else "Empty"
 
-                // threshold (kg -> g)
-                val thKg = when (val v = snap.child("threshold").value) {
-                    is Number -> v.toDouble()
-                    is String -> v.toDoubleOrNull() ?: 0.0
-                    else -> 0.0
+                // 🔥 threshold stored in GRAMS now
+                val thVal = snap.child("threshold").value
+                thresholdGrams = when (thVal) {
+                    is Number -> thVal.toInt()
+                    is String -> thVal.toIntOrNull() ?: 0
+                    else -> 0
                 }
-                thresholdGrams = (thKg * 1000).toInt()
 
                 // last_updated
                 lastUpdatedIso = snap.child("last_updated").getValue(String::class.java)
@@ -133,11 +133,16 @@ class SlotDetailPresenter(private val view: SlotDetailView) {
         write(mapOf("notif_enabled" to enabled, "last_updated" to isoNow()))
     }
 
+    // 🔥 now writes integer grams instead of kg float
     fun applyNewThreshold(newValueGrams: Int) {
         thresholdGrams = newValueGrams
-        val kg = newValueGrams / 1000.0
-        write(mapOf("threshold" to kg, "last_updated" to isoNow()))
-        view.showToast("Threshold set to ${newValueGrams}g")
+        write(
+            mapOf(
+                "threshold" to newValueGrams,   // store grams
+                "last_updated" to isoNow()
+            )
+        )
+        view.showToast("Threshold set to ${newValueGrams} g")
     }
 
     private fun write(payload: Map<String, Any>) {

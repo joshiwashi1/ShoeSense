@@ -15,7 +15,7 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
 
     companion object {
         const val EXTRA_SLOT_NUMBER = "slot_number"   // for edit mode (1-based)
-        const val EXTRA_IS_EDIT = "is_edit"           // NEW: false = create, true = edit
+        const val EXTRA_IS_EDIT = "is_edit"           // false = create, true = edit
         const val RESULT_SAVED = 1001
     }
 
@@ -34,8 +34,8 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the ActionBar (if theme shows one)
-        actionBar?.hide()
+        // Hide the ActionBar (for AppCompatActivity)
+        supportActionBar?.hide()
         // Hide the STATUS BAR (not nav bar)
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_add_slot)
@@ -58,10 +58,16 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
         presenter = AddSlotPresenter(this, this)
         presenter.load(slotNumber, isEdit)
 
-        // Display slider value live
+        // Slider config: 0–1000 g, step 10 g
+        slider.valueFrom = 0f
+        slider.valueTo = 1000f
+        slider.stepSize = 10f
+
+        // Display slider value live in GRAMS
         slider.addOnChangeListener { _, value, _ ->
-            tvThresholdValue.text = String.format("%.1f kg", value)
-            presenter.setThreshold(slotNumber, value) // local prefs cache
+            val grams = value.toInt()
+            tvThresholdValue.text = "$grams g"
+            presenter.setThreshold(slotNumber, grams) // cache in grams
         }
 
         btnAddSlotName.setOnClickListener {
@@ -80,10 +86,8 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
 
         btnAddSlot.setOnClickListener {
             if (isEdit) {
-                // Update existing slotN
                 presenter.updateExisting(slotNumber)
             } else {
-                // Create: push a brand-new child (auto id) and assign next index
                 presenter.createNew()
             }
         }
@@ -93,26 +97,31 @@ class AddSlotActivity : AppCompatActivity(), AddSlotView {
     }
 
     // --- AddSlotView impl ---
+
     override fun showName(name: String) {
         btnAddSlotName.text = if (name.isBlank()) "Add Slot Name" else name
     }
 
-    override fun showThreshold(value: Float) {
-        // Set slider range if you haven’t in XML:
+    override fun showThreshold(grams: Int) {
+        // Ensure slider is configured
         if (slider.valueFrom == 0f && slider.valueTo == 0f) {
             slider.valueFrom = 0f
-            slider.valueTo = 5.0f   // e.g., up to 5 kg; adjust to your load cell
-            slider.stepSize = 0.1f  // 100 g steps on UI (we still snap to 10 g at save)
+            slider.valueTo = 1000f
+            slider.stepSize = 10f
         }
-        slider.value = value
-        tvThresholdValue.text = String.format("%.1f kg", value)
+
+        val clamped = grams.coerceIn(0, 1000)
+        slider.value = clamped.toFloat()
+        tvThresholdValue.text = "$clamped g"
     }
 
     override fun showToast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    override fun closeScreen() { finish() }
+    override fun closeScreen() {
+        finish()
+    }
 
     override fun onSaved() {
         setResult(RESULT_SAVED)

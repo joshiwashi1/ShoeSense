@@ -117,9 +117,19 @@ class SlotDetailActivity : AppCompatActivity(), SlotDetailView {
 
     override fun showStatus(status: String) {
         tvStatus.text = status
-        // optional:
-        // tvStatus.setBackgroundResource(if (status == "Occupied") R.drawable.bg_green else R.drawable.bg_red)
+
+        // Normalize check (in case you pass "occupied", "Occupied", etc.)
+        val isOccupied = status.equals("Occupied", ignoreCase = true)
+
+        // Change background based on current status
+        val bgRes = if (isOccupied) {
+            R.drawable.bg_green
+        } else {
+            R.drawable.bg_red_empty
+        }
+        tvStatus.setBackgroundResource(bgRes)
     }
+
 
     override fun showTimeline(occupiedAt: String?, emptyAt: String?) {
         val occ = occupiedAt?.let { "Occupied at $it" }

@@ -27,7 +27,7 @@ class AddSlotPresenter(
      */
     private fun getSlotsBasePath(): String {
         val siteId = AppConfig.siteId ?: "home001"
-        return "shoe_slots/$siteId" // Shared across all users in the site
+        return "shoe_slots/$siteId"
     }
 
     /**
@@ -51,9 +51,9 @@ class AddSlotPresenter(
     fun load(slot: Int, isEdit: Boolean) {
         val cacheKey = getCacheKey(slot)
         val name = if (isEdit) prefs.getString("${cacheKey}_name", "") ?: "" else ""
-        val thKg = if (isEdit) prefs.getFloat("${cacheKey}_threshold", 0f) else 0.0f
+        val grams = if (isEdit) prefs.getInt("${cacheKey}_threshold_g", 500) else 500
         view.showName(name)
-        view.showThreshold(thKg)
+        view.showThreshold(grams)
     }
 
     fun setName(slot: Int, name: String) {
@@ -61,30 +61,29 @@ class AddSlotPresenter(
         prefs.edit { putString("${cacheKey}_name", name) }
     }
 
-    fun setThreshold(slot: Int, valueKg: Float) {
+    fun setThreshold(slot: Int, grams: Int) {
         val cacheKey = getCacheKey(slot)
-        prefs.edit { putFloat("${cacheKey}_threshold", valueKg) }
+        prefs.edit { putInt("${cacheKey}_threshold_g", grams) }
     }
 
     fun updateExisting(slot: Int) {
         val cacheKey = getCacheKey(slot)
         val name = prefs.getString("${cacheKey}_name", "") ?: ""
-        val thKgRaw = prefs.getFloat("${cacheKey}_threshold", 0f)
+        val gramsRaw = prefs.getInt("${cacheKey}_threshold_g", 500)
 
         if (name.isBlank()) {
             view.showToast("Please set a slot name.")
             return
         }
 
-        val gramsSnapped = snapToStep(thKgRaw * 1000f)
-        val thKgSnapped = gramsSnapped / 1000.0
+        val gramsSnapped = snapToStep(gramsRaw.toFloat())
 
         val nodeKey = "slot$slot"
         val payload = mapOf(
             "name" to name,
-            "threshold" to thKgSnapped,
+            "threshold" to gramsSnapped,          // 🔥 integer grams
             "last_updated" to isoNow(),
-            "last_updated_by" to getCurrentUserId() // Fixed: using helper function
+            "last_updated_by" to getCurrentUserId()
         )
 
         db.child(getSlotsBasePath()).child(nodeKey).updateChildren(payload)
@@ -103,15 +102,14 @@ class AddSlotPresenter(
     fun createNew() {
         val cacheKey = getCacheKey(1)
         val name = prefs.getString("${cacheKey}_name", "") ?: ""
-        val thKgRaw = prefs.getFloat("${cacheKey}_threshold", 0f)
+        val gramsRaw = prefs.getInt("${cacheKey}_threshold_g", 500)
 
         if (name.isBlank()) {
             view.showToast("Please set a slot name.")
             return
         }
 
-        val gramsSnapped = snapToStep(thKgRaw * 1000f)
-        val thKgSnapped = gramsSnapped / 1000.0
+        val gramsSnapped = snapToStep(gramsRaw.toFloat())
 
         // Find next available slot number
         db.child(getSlotsBasePath()).get()
@@ -121,17 +119,16 @@ class AddSlotPresenter(
 
                 val payload = mapOf(
                     "name" to name,
-                    "threshold" to thKgSnapped,
-                    "current_weight" to 0.0,
+                    "threshold" to gramsSnapped,      // 🔥 integer grams
+                    "current_weight" to 0,
                     "status" to "empty",
                     "last_updated" to isoNow(),
-                    "created_by" to getCurrentUserId(), // Fixed: using helper function
-                    "last_updated_by" to getCurrentUserId() // Fixed: using helper function
+                    "created_by" to getCurrentUserId(),
+                    "last_updated_by" to getCurrentUserId()
                 )
 
                 db.child(getSlotsBasePath()).child(slotId).updateChildren(payload)
                     .addOnSuccessListener {
-                        // Clear cache after successful creation
                         clearCache(1)
                         view.showToast("Added $name")
                         view.onSaved()
@@ -176,7 +173,7 @@ class AddSlotPresenter(
         val cacheKey = getCacheKey(slot)
         prefs.edit {
             remove("${cacheKey}_name")
-            remove("${cacheKey}_threshold")
+            remove("${cacheKey}_threshold_g")
         }
     }
 }
