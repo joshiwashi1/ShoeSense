@@ -1,6 +1,8 @@
 package com.shoesense.shoesense.home
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import com.shoesense.shoesense.Model.Slot
 import com.shoesense.shoesense.Model.SlotRepository
 
@@ -11,8 +13,10 @@ class HomeDashboardPresenter(private val ctx: Context) {
     private val maxSlots = 12
     private var observing = false
 
-    // NEW: keep the latest snapshot so we can compute canAddMore()
+    // Keep the latest snapshot so we can compute canAddMore()
     private var latestSlots: List<Slot> = emptyList()
+
+    private val handler = Handler(Looper.getMainLooper())
 
     fun attach(v: HomeDashboardView) {
         view = v
@@ -26,8 +30,28 @@ class HomeDashboardPresenter(private val ctx: Context) {
     }
 
     fun load() {
-        // idempotent: ensures we’re observing after returning from detail/add screens
-        if (!observing) observe()
+        // Show loading overlay
+        (view as? HomeDashboardActivity)?.showLoadingState()
+
+        // Simulate network / IoT checks with delay
+        handler.postDelayed({
+
+            val isNetworkAvailable = true  // replace with real network check
+            val isIotConnected = true      // replace with real IoT check
+
+            if (!isNetworkAvailable) {
+                (view as? HomeDashboardActivity)?.showNoNetworkOverlay()
+                return@postDelayed
+            }
+            if (!isIotConnected) {
+                (view as? HomeDashboardActivity)?.showIotNotFoundOverlay()
+                return@postDelayed
+            }
+
+            // Normal flow: start observing slots
+            if (!observing) observe()
+
+        }, 1500) // 1.5s simulated delay
     }
 
     private fun observe() {
@@ -35,13 +59,16 @@ class HomeDashboardPresenter(private val ctx: Context) {
         repo.observeSlots(
             maxSlots = maxSlots,
             onUpdate = { slots ->
-                // NEW: cache
                 latestSlots = slots
 
                 val rows = buildRows(slots)
                 view?.render(rows)
             },
-            onError = { msg -> view?.showError(msg) }
+            onError = { msg ->
+                view?.showError(msg)
+                // Optionally show no network overlay if repo fails
+                (view as? HomeDashboardActivity)?.showNoNetworkOverlay()
+            }
         )
     }
 
@@ -51,10 +78,7 @@ class HomeDashboardPresenter(private val ctx: Context) {
     }
 
     fun nextSlotNumber(): Int = repo.nextSlotNumber(maxSlots)
-
-    // NEW: used by Activity before launching Add in CREATE mode
     fun canAddMore(): Boolean = latestSlots.size < maxSlots
-
     fun onAddClicked() = view?.openAddSlot()
     fun onSlotClicked(s: Slot) = view?.openSlotDetail(s)
 }

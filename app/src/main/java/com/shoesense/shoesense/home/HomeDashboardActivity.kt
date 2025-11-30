@@ -5,11 +5,8 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.shoesense.shoesense.Model.Slot
+import com.shoesense.shoesense.BaseActivity
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.AddSlot.AddSlotActivity
 import com.shoesense.shoesense.Repository.AppConfig
@@ -17,8 +14,7 @@ import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
-
-class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
+class HomeDashboardActivity : BaseActivity(), HomeDashboardView {
 
     private lateinit var rv: RecyclerView
     private lateinit var adapter: SlotAdapter
@@ -28,6 +24,11 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     private lateinit var tvActiveSlots: TextView
     private lateinit var tvEmptySlots: TextView
     private lateinit var tvTotalSlots: TextView
+
+    // Retry buttons
+    private lateinit var btnLoadingRetry: Button
+    private lateinit var btnNoNetworkRetry: Button
+    private lateinit var btnIotRetry: Button
 
     private val refreshLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -39,20 +40,19 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the AppCompat ActionBar (if your theme still shows one)
-        actionBar?.hide()
-        // Hide the STATUS BAR (not the nav bar)
+
+        // Hide ActionBar and status bar
+        supportActionBar?.hide()
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
+        // Inflate layout + global loading overlay
         setContentView(R.layout.activity_home_dashboard)
 
-        // --- bind Overview counters ---
-        tvActiveSlots = findViewById(R.id.tvActiveSlots)
-        // NOTE: XML id is tvNotifications but label is "Empty Slots"
-        tvEmptySlots = findViewById(R.id.tvNotifications)
-        tvTotalSlots = findViewById(R.id.tvTotalSlots)
+        bindViews()
+        attachNavbar()
+        attachRetryButtons()
 
-        // --- init grid ---
-        rv = findViewById(R.id.slotRecyclerView)
+        // Initialize RecyclerView grid
         rv.layoutManager = GridLayoutManager(this, 2)
         adapter = SlotAdapter(
             onAdd = { presenter.onAddClicked() },
@@ -60,42 +60,63 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         )
         rv.adapter = adapter
 
-        // --- bottom nav ---
+        // Initialize presenter
+        presenter = HomeDashboardPresenter(this)
+        presenter.attach(this)
+
+        // Show loading overlay while loading
+        showLoadingState()
+        presenter.load()
+    }
+
+    private fun bindViews() {
+        tvActiveSlots = findViewById(R.id.tvActiveSlots)
+        tvEmptySlots = findViewById(R.id.tvNotifications)
+        tvTotalSlots = findViewById(R.id.tvTotalSlots)
+
+        rv = findViewById(R.id.slotRecyclerView)
+
+        // Retry buttons from BaseActivity overlay
+        btnLoadingRetry = findViewById(R.id.btnLoadingRetry)
+        btnNoNetworkRetry = findViewById(R.id.btnNoNetworkRetry)
+        btnIotRetry = findViewById(R.id.btnIotRetry)
+    }
+
+    private fun attachNavbar() {
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
             callbacks = BottomNavbar.Callbacks(
                 onHome = { rv.smoothScrollToPosition(0) },
-                onHistory = {
-                    // startActivity(Intent(this, HistoryActivity::class.java))
-                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                },
-                onNotifications = {
-                    // startActivity(Intent(this, NotificationActivity::class.java))
-                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                },
+                onHistory = { /* Optional */ },
+                onNotifications = { /* Optional */ },
                 onSettings = {
                     startActivity(Intent(this, SettingsActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 }
             ),
-            selectedTint   = ContextCompat.getColor(this, android.R.color.white),
-            unselectedTint = ContextCompat.getColor(this, android.R.color.white),
+            selectedTint = getColor(android.R.color.white),
+            unselectedTint = getColor(android.R.color.white),
             unselectedAlpha = 0.35f
         )
-
-        // --- presenter ---
-        presenter = HomeDashboardPresenter(this)
-        presenter.attach(this)
-        presenter.load()
     }
 
-    override fun onDestroy() {
-        presenter.detach()
-        super.onDestroy()
+    private fun attachRetryButtons() {
+        btnLoadingRetry.setOnClickListener {
+            showLoadingState()
+            presenter.load()
+        }
+        btnNoNetworkRetry.setOnClickListener {
+            showLoadingState()
+            presenter.load()
+        }
+        btnIotRetry.setOnClickListener {
+            showLoadingState()
+            presenter.load()
+        }
     }
 
-    // --- HomeDashboardView ---
+    // --- HomeDashboardView implementation ---
     override fun render(items: List<SlotRow>) {
         if (!::adapter.isInitialized) return
         adapter.submitList(items)
@@ -106,43 +127,49 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         val empty = total - active
 
         tvActiveSlots.text = active.toString()
-        tvEmptySlots.text  = empty.toString()
-        tvTotalSlots.text  = total.toString()
+        tvEmptySlots.text = empty.toString()
+        tvTotalSlots.text = total.toString()
+
+        hideAllStates() // hide loading once data is rendered
     }
 
     override fun openAddSlot() {
-        // Prefer a boolean guard; if you must keep nextSlotNumber(), treat <=0 as "no space"
         val canAdd = presenter.canAddMore()
         if (!canAdd) {
             showError("Maximum of 12 slots reached.")
             return
         }
-
         val intent = Intent(this, AddSlotActivity::class.java)
             .putExtra(AddSlotActivity.EXTRA_IS_EDIT, false) // CREATE mode
         refreshLauncher.launch(intent)
     }
 
     override fun openSlotDetail(slot: Slot) {
-        val siteId = AppConfig.siteId ?: "home001"   // or your real current site
-
+        val siteId = AppConfig.siteId ?: "home001"
         val intent = Intent(this, SlotDetailActivity::class.java).apply {
-            putExtra("slot_id", slot.id)    // e.g. "slot1"
-            putExtra("site_id", siteId)     // e.g. "home001"
+            putExtra("slot_id", slot.id)
+            putExtra("site_id", siteId)
         }
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-
-
     override fun showError(message: String) {
-        // TODO: Toast or Snackbar
-        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
         super.onResume()
+        showLoadingState()
         presenter.load()
     }
+
+    override fun onDestroy() {
+        presenter.detach()
+        super.onDestroy()
+    }
+
+    // Optional: show overlays manually
+    fun showNoNetworkOverlay() = showNoNetworkState()
+    fun showIotNotFoundOverlay() = showIotNotFoundState()
 }

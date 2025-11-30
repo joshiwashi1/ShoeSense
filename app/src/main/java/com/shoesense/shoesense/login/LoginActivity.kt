@@ -1,52 +1,64 @@
 package com.shoesense.shoesense.login
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.shoesense.shoesense.BaseActivity
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.AuthRepository
 import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.forgotpassword.ForgotPasswordActivity
 import com.shoesense.shoesense.register.RegisterActivity
 
-class LoginActivity : Activity(), LoginView {
+class LoginActivity : BaseActivity(), LoginView {
 
     private lateinit var loginEmail: EditText
     private lateinit var loginPassword: EditText
     private lateinit var presenter: LoginPresenter
     private lateinit var forgotPasswordText: TextView
+    private lateinit var registerText: TextView
+    private lateinit var loginBtn: Button
+    private lateinit var btnLoadingRetry: Button
+    private lateinit var btnNoNetworkRetry: Button
+    private lateinit var btnIotRetry: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the AppCompat ActionBar (if your theme still shows one)
-        actionBar?.hide()
-        // Hide the STATUS BAR (not the nav bar)
+
+        // Hide ActionBar & StatusBar
+        supportActionBar?.hide()
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        // ❗ Always show login; also ensure any previous session is cleared
+
+        // Clear previous session
         AuthRepository.logout()
 
         setContentView(R.layout.activity_login)
 
-        // --- Bind Views ---
-        loginEmail = findViewById(R.id.email_edit_text)
-        loginPassword = findViewById(R.id.password_edit_text)
-        val loginBtn = findViewById<Button>(R.id.login_Button)
-        val registerText = findViewById<TextView>(R.id.register_here)
-        forgotPasswordText = findViewById(R.id.forgot_password)
+        bindViews()
+        setupListeners()
 
-        // --- Presenter ---
+        // Initialize presenter
         presenter = LoginPresenter(this)
 
-        // --- Click Listeners ---
-        loginBtn.setOnClickListener {
-            val email = loginEmail.text.toString().trim()
-            val password = loginPassword.text.toString().trim()
-            presenter.onLoginClicked(email, password)
-        }
+        // Wire retry button from BaseActivity overlay
+        btnLoadingRetry.setOnClickListener { handleLogin() }
+        btnNoNetworkRetry.setOnClickListener { handleLogin() }
+        btnIotRetry.setOnClickListener { handleLogin() }
+    }
+
+    private fun bindViews() {
+        loginEmail = findViewById(R.id.email_edit_text)
+        loginPassword = findViewById(R.id.password_edit_text)
+        loginBtn = findViewById(R.id.login_Button)
+        registerText = findViewById(R.id.register_here)
+        forgotPasswordText = findViewById(R.id.forgot_password)
+    }
+
+    private fun setupListeners() {
+        loginBtn.setOnClickListener { handleLogin() }
 
         registerText.setOnClickListener {
             Toast.makeText(this, "Opening Register Page", Toast.LENGTH_SHORT).show()
@@ -58,23 +70,45 @@ class LoginActivity : Activity(), LoginView {
         }
     }
 
+    private fun handleLogin() {
+        val email = loginEmail.text.toString().trim()
+        val password = loginPassword.text.toString().trim()
+
+        if (email.isEmpty()) {
+            showEmailError("Email is required")
+            return
+        }
+        if (password.isEmpty()) {
+            showPasswordError("Password is required")
+            return
+        }
+
+        // Show loading overlay while authenticating
+        showLoadingState()
+
+        presenter.onLoginClicked(email, password)
+    }
+
     // --- LoginView implementation ---
 
     override fun showEmailError(msg: String) {
+        hideAllStates()
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     override fun showPasswordError(msg: String) {
+        hideAllStates()
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     override fun showLoginSuccess() {
+        hideAllStates()
         Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
     }
 
     override fun navigateToDashboard() {
-        val intent = Intent(this, HomeDashboardActivity::class.java)
-        startActivity(intent)
+        hideAllStates()
+        startActivity(Intent(this, HomeDashboardActivity::class.java))
         finish()
     }
 
