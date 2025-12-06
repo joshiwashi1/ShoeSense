@@ -1,46 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:layout_marginBottom="10dp">
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:id="@+id/imgShoeIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@drawable/shoe"
-        android:layout_marginEnd="10dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp" />
 
+    <!-- Status pill (fixed column at far right) -->
     <TextView
-        android:id="@+id/tvAction"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:id="@+id/tvStatus"
+        android:layout_width="72dp"
         android:layout_height="wrap_content"
-        android:text="Slot 1 became occupied"
-        android:textColor="@android:color/black"
-        android:textSize="14sp" />
+        android:gravity="center"
+        android:text="empty"
+        android:textColor="@android:color/white"
+        android:background="@drawable/status_empty_bg"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="8dp" />
 
+    <!-- Time column (always just left of status) -->
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="10:30 AM"
+        android:text="10:35 AM"
         android:textColor="@android:color/black"
         android:textSize="12sp"
-        android:layout_marginEnd="5dp" />
+        app:layout_constraintEnd_toStartOf="@id/tvStatus"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp" />
 
+    <!-- Main text fills remaining space -->
     <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvAction"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Occupied"
-        android:textColor="@android:color/white"
-        android:background="@drawable/status_occupied_bg"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:textSize="12sp"
-        android:layout_marginStart="5dp" />
-</LinearLayout>
+        android:text="This slot1 was empty"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@id/imgShoeIcon"
+        app:layout_constraintEnd_toStartOf="@id/tvTime"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

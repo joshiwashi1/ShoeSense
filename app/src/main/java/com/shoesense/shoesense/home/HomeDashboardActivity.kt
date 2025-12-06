@@ -15,6 +15,8 @@ import com.shoesense.shoesense.AddSlot.AddSlotActivity
 import com.shoesense.shoesense.Repository.AppConfig
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
+import com.shoesense.shoesense.history.HistoryActivity
+import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
 
@@ -67,12 +69,12 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
             callbacks = BottomNavbar.Callbacks(
                 onHome = { rv.smoothScrollToPosition(0) },
                 onHistory = {
-                    // startActivity(Intent(this, HistoryActivity::class.java))
-                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 },
                 onNotifications = {
-                    // startActivity(Intent(this, NotificationActivity::class.java))
-                    // overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    startActivity(Intent(this, NotificationActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 },
                 onSettings = {
                     startActivity(Intent(this, SettingsActivity::class.java))

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="#FFD428"
     tools:context=".history.HistoryActivity">
 
@@ -18,66 +18,29 @@
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true" />
 
-    <!-- Filter Buttons -->
-    <LinearLayout
-        android:id="@+id/llFilterButtons"
+    <!-- Slot filter dropdown -->
+    <Spinner
+        android:id="@+id/spnSlotFilter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvHistoryTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnAll"
-            android:layout_width="70dp"
-            android:layout_height="38dp"
-            android:text="All"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#2196F3"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnSlot1"
-            android:layout_width="70dp"
-            android:layout_height="38dp"
-            android:text="Slot 1"
-            android:textColor="@android:color/black"
-            android:backgroundTint="@android:color/white"
-            android:layout_marginStart="8dp" />
-
-        <Button
-            android:id="@+id/btnSlot2"
-            android:layout_width="70dp"
-            android:layout_height="38dp"
-            android:text="Slot 2"
-            android:textColor="@android:color/black"
-            android:backgroundTint="@android:color/white"
-            android:layout_marginStart="8dp" />
-
-        <Button
-            android:id="@+id/btnSlot3"
-            android:layout_width="70dp"
-            android:layout_height="38dp"
-            android:text="Slot 3"
-            android:textColor="@android:color/black"
-            android:backgroundTint="@android:color/white"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
+        android:spinnerMode="dropdown" />
 
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerHistory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/llFilterButtons"
+        android:layout_below="@id/spnSlotFilter"
         android:layout_above="@id/bottomNavigation"
         android:layout_marginTop="20dp"
         android:padding="10dp"
         android:clipToPadding="false"
         android:scrollbars="vertical" />
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (same as before) -->
     <LinearLayout
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -120,7 +83,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/history_icon"
-                android:contentDescription="Analytics" />
+                android:contentDescription="History" />
         </LinearLayout>
 
         <!-- Notifications -->

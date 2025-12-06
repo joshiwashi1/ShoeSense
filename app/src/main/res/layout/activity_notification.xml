@@ -8,18 +8,23 @@
     tools:context=".notification.NotificationActivity">
 
     <!-- Title -->
-    <TextView
-        android:id="@+id/notificationTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Notifications"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="24dp" />
 
     <!-- Filter Buttons Row -->
+
+    <TextView
+        android:id="@+id/notificationTitle"
+        android:layout_width="152dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="130dp"
+        android:text="Notifications"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
     <LinearLayout
         android:id="@+id/filterContainer"
         android:layout_width="wrap_content"

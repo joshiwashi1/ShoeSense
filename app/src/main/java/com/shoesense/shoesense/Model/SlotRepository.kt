@@ -8,7 +8,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class SlotRepository(private val ctx: Context) {
+class SlotRepository(
+    private val ctx: Context,
+    private val enableHistoryLogging: Boolean = true   // dashboard: true, history screen: false
+) {
 
     private val auth = FirebaseAuth.getInstance()
     private var ref: DatabaseReference? = null
@@ -17,24 +20,21 @@ class SlotRepository(private val ctx: Context) {
     // cache latest list so presenter can compute next slot number
     private var cached: List<Slot> = emptyList()
 
-    /**
-     * Get the shared slots path for the current site
-     */
+    // last status we logged per slot
+    private val lastLoggedStatus: MutableMap<String, String> = mutableMapOf()
+
+    // NEW: last time (ms) we logged anything for that slot
+    private val lastLoggedTime: MutableMap<String, Long> = mutableMapOf()
+
     private fun getSlotsBasePath(): String {
         val siteId = AppConfig.siteId ?: "home001"
-        return "shoe_slots/$siteId" // Shared across all users in the site
+        return "shoe_slots/$siteId"
     }
 
-    /**
-     * Initialize database reference with proper path
-     */
     private fun getDatabaseReference(): DatabaseReference {
         return FirebaseDatabase.getInstance().reference.child(getSlotsBasePath())
     }
 
-    /**
-     * Observe all slots live (up to maxSlots). Call stopObserving() in onDestroy/onStop.
-     */
     fun observeSlots(
         maxSlots: Int,
         onUpdate: (List<Slot>) -> Unit,
@@ -48,7 +48,6 @@ class SlotRepository(private val ctx: Context) {
                 val list = snapshot.children.mapNotNull { child ->
                     child.toSlot()
                 }
-                    // Sort by slot number extracted from slot ID (slot1, slot2, etc.)
                     .sortedBy { extractSlotNumberFromId(it.id) ?: Int.MAX_VALUE }
                     .take(maxSlots)
 
@@ -68,31 +67,20 @@ class SlotRepository(private val ctx: Context) {
         listener = null
     }
 
-    /**
-     * Compute next available slot number (1..maxSlots) based on cached snapshot.
-     */
     fun nextSlotNumber(maxSlots: Int): Int {
         val used = cached.mapNotNull { extractSlotNumberFromId(it.id) }.toSet()
         for (n in 1..maxSlots) if (!used.contains(n)) return n
         return (cached.size + 1).coerceAtMost(maxSlots)
     }
 
-    /**
-     * Get a specific slot by ID
-     */
     fun getSlot(slotId: String, onResult: (Slot?) -> Unit) {
         getDatabaseReference().child(slotId).get()
             .addOnSuccessListener { snapshot ->
                 onResult(snapshot.toSlot())
             }
-            .addOnFailureListener {
-                onResult(null)
-            }
+            .addOnFailureListener { onResult(null) }
     }
 
-    /**
-     * Update slot status
-     */
     fun updateSlotStatus(slotId: String, occupied: Boolean, onComplete: (Boolean) -> Unit) {
         val updates = mapOf(
             "status" to if (occupied) "occupied" else "empty",
@@ -105,9 +93,6 @@ class SlotRepository(private val ctx: Context) {
             .addOnFailureListener { onComplete(false) }
     }
 
-    /**
-     * Update slot threshold
-     */
     fun updateSlotThreshold(slotId: String, threshold: Double, onComplete: (Boolean) -> Unit) {
         val updates = mapOf(
             "threshold" to threshold,
@@ -120,9 +105,6 @@ class SlotRepository(private val ctx: Context) {
             .addOnFailureListener { onComplete(false) }
     }
 
-    /**
-     * Update slot name
-     */
     fun updateSlotName(slotId: String, name: String, onComplete: (Boolean) -> Unit) {
         val updates = mapOf(
             "name" to name,
@@ -135,18 +117,12 @@ class SlotRepository(private val ctx: Context) {
             .addOnFailureListener { onComplete(false) }
     }
 
-    /**
-     * Delete a slot
-     */
     fun deleteSlot(slotId: String, onComplete: (Boolean) -> Unit) {
         getDatabaseReference().child(slotId).removeValue()
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
     }
 
-    /**
-     * Get all slots once (non-reactive)
-     */
     fun getAllSlots(onResult: (List<Slot>) -> Unit, onError: (String) -> Unit) {
         getDatabaseReference().get()
             .addOnSuccessListener { snapshot ->
@@ -174,19 +150,14 @@ class SlotRepository(private val ctx: Context) {
         val id = key ?: return null
         val name = getStringFlex("name") ?: id.capitalizeSlot()
 
-        // read values
         val threshold = getDoubleFlex("threshold") ?: 0.0
         val weight = getDoubleFlex("current_weight") ?: getDoubleFlex("currentWeight") ?: 0.0
 
-        // manual fallback
         val statusValue = getStringFlex("status")?.lowercase(Locale.getDefault())
         val manualOccupied = statusValue == "occupied"
 
-        // hysteresis to reduce flicker (50g)
         val bufferKg = 0.05
         val autoOccupied = weight >= (threshold - bufferKg)
-
-        // 🔥 always trust weight-based detection (0 should also mean empty)
         val occupied = autoOccupied
 
         val lastUpdated = getStringFlex("last_updated")
@@ -196,17 +167,31 @@ class SlotRepository(private val ctx: Context) {
         val lastUpdatedBy = getStringFlex("last_updated_by") ?: "unknown"
         val createdBy = getStringFlex("created_by") ?: "unknown"
 
-        // 🔥 Mirror back status when different (even when weight = 0)
-        if (manualOccupied != autoOccupied) {
+        // only the "logging" repo is allowed to write history
+        if (enableHistoryLogging && manualOccupied != autoOccupied) {
+            val newStatus = if (autoOccupied) "occupied" else "empty"
+            val nowIso = isoNow()
+
             try {
                 getDatabaseReference().child(id).updateChildren(
                     mapOf(
-                        "status" to if (autoOccupied) "occupied" else "empty",
-                        "last_updated" to isoNow(),
+                        "status" to newStatus,
+                        "last_updated" to nowIso,
                         "last_updated_by" to (auth.currentUser?.uid ?: "unknown")
                     )
                 )
-            } catch (_: Exception) { /* ignore */ }
+
+                // 🔴 add name here
+                pushHistoryEvent(
+                    slotId = id,
+                    slotName = name,     // <--- NEW
+                    status = newStatus,
+                    weight = weight,
+                    threshold = threshold
+                )
+            } catch (_: Exception) {
+                // ignore
+            }
         }
 
         return Slot(
@@ -222,8 +207,57 @@ class SlotRepository(private val ctx: Context) {
         )
     }
 
+    // ============ HISTORY LOGGER (TIME-DEBOUNCED) ============
+    // ============ HISTORY LOGGER (NO DUPLICATES, BUT LOGS REAL CHANGES) ============
+    private fun pushHistoryEvent(
+        slotId: String,
+        slotName: String,
+        status: String,
+        weight: Double,
+        threshold: Double
+    ) {
+        val now = System.currentTimeMillis()
+        val lastStatus = lastLoggedStatus[slotId]
+        val lastTime = lastLoggedTime[slotId] ?: 0L
 
-    // -------- Flexible getters that never crash on type mismatch --------
+        // debounce only SAME status to avoid spam (e.g. occupied, occupied, occupied...)
+        val debounceSameStatusMs = 5_000L
+
+        // 1) If SAME status and very recent -> skip duplicate
+        if (lastStatus != null &&
+            status.equals(lastStatus, ignoreCase = true) &&
+            now - lastTime < debounceSameStatusMs
+        ) {
+            return
+        }
+
+        // ✅ If status is different (occupied -> empty or empty -> occupied),
+        // we ALWAYS log it, no time blocking.
+
+        // update caches
+        lastLoggedStatus[slotId] = status
+        lastLoggedTime[slotId] = now
+
+        val siteId = AppConfig.siteId ?: "home001"
+        val ref = FirebaseDatabase.getInstance()
+            .reference
+            .child("shoe_history")
+            .child(siteId)
+            .child(slotId)
+            .push()
+
+        val data = mapOf(
+            "status" to status,
+            "last_updated" to isoNow(),
+            "weight" to weight,
+            "threshold" to threshold,
+            "slot_name" to slotName        // 🔴 store name with event
+        )
+
+        ref.updateChildren(data)
+    }
+
+
     private fun DataSnapshot.getStringFlex(vararg keys: String, default: String? = null): String? {
         for (k in keys) {
             val ch = child(k)
@@ -232,7 +266,6 @@ class SlotRepository(private val ctx: Context) {
                 null -> continue
                 is String -> return v
                 is Number -> {
-                    // Avoid 123.0 when it was an integer
                     return if (v is Double && v % 1.0 == 0.0) v.toLong().toString() else v.toString()
                 }
                 is Boolean -> return v.toString()
@@ -272,27 +305,16 @@ class SlotRepository(private val ctx: Context) {
             return replaceFirstChar { it.titlecase(Locale.getDefault()) }
         }
         val n = extractSlotNumberFromId(this)
-        return if (n != null) {
-            "Slot $n"
-        } else {
-            replaceFirstChar { it.titlecase(Locale.getDefault()) }
-        }
+        return if (n != null) "Slot $n" else replaceFirstChar { it.titlecase(Locale.getDefault()) }
     }
 
-    /**
-     * Extract slot number from slot ID (e.g., "slot1" -> 1, "slot2" -> 2)
-     */
     private fun extractSlotNumberFromId(slotId: String): Int? {
         val regex = Regex("""^slot(\d+)$""", RegexOption.IGNORE_CASE)
         val m = regex.find(slotId) ?: return null
         return m.groupValues.getOrNull(1)?.toIntOrNull()
     }
 
-    /**
-     * Extract slot number from slot name (e.g., "Slot 1" -> 1, "slot2" -> 2)
-     */
     fun extractSlotNumber(name: String): Int? {
-        // match "Slot 3" or "slot3"
         val regex = Regex("""slot\s*(\d+)""", RegexOption.IGNORE_CASE)
         val m = regex.find(name) ?: return null
         return m.groupValues.getOrNull(1)?.toIntOrNull()

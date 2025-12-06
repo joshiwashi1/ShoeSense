@@ -2,9 +2,17 @@ package com.shoesense.shoesense.history
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.shoesense.shoesense.Model.Slot
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.shoesense.shoesense.Model.HistoryRepository
+import com.shoesense.shoesense.Model.SlotEvent
+import com.shoesense.shoesense.Model.SlotRepository
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.home.HomeDashboardActivity
@@ -15,13 +23,46 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
 
     private lateinit var presenter: HistoryPresenter
 
+    private lateinit var recyclerHistory: RecyclerView
+    private lateinit var spnSlotFilter: Spinner
+
+    private val adapter = HistoryAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
-        presenter = HistoryPresenter(this)
+        // RecyclerView
+        recyclerHistory = findViewById(R.id.recyclerHistory)
+        recyclerHistory.layoutManager = LinearLayoutManager(this)
+        recyclerHistory.adapter = adapter
+
+        // Spinner
+        spnSlotFilter = findViewById(R.id.spnSlotFilter)
+
+        // Presenter: uses both SlotRepository (for slots) and HistoryRepository (for events)
+        val slotRepo = SlotRepository(this, enableHistoryLogging = false)
+        val historyRepo = HistoryRepository()
+        presenter = HistoryPresenter(this, slotRepo, historyRepo)
         presenter.observeSlots(maxSlots = 10)
 
+        // Spinner selection → presenter
+        spnSlotFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                presenter.onFilterSelectedPosition(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
+        }
+
+        // Bottom navbar
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HISTORY,
@@ -31,7 +72,7 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
-                onHistory = {},
+                onHistory = { /* already here */ },
                 onNotifications = {
                     startActivity(Intent(this, NotificationActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -47,12 +88,23 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
         )
     }
 
-    override fun onSlotsUpdated(slots: List<Slot>) {
-        // Update RecyclerView or UI
-        Toast.makeText(this, "Fetched ${slots.size} slots", Toast.LENGTH_SHORT).show()
+    // ==== HistoryView implementation ====
+
+    override fun showEvents(events: List<SlotEvent>) {
+        adapter.submitList(events)
     }
 
-    override fun onError(message: String) {
+    override fun showSlotFilterOptions(options: List<String>) {
+        val spinnerAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            options
+        )
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spnSlotFilter.adapter = spinnerAdapter
+    }
+
+    override fun showError(message: String) {
         Toast.makeText(this, "Error: $message", Toast.LENGTH_SHORT).show()
     }
 
