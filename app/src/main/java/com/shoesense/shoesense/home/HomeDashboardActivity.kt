@@ -19,7 +19,6 @@ import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
-
 class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
     private lateinit var rv: RecyclerView
@@ -41,19 +40,14 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the AppCompat ActionBar (if your theme still shows one)
         actionBar?.hide()
-        // Hide the STATUS BAR (not the nav bar)
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_home_dashboard)
 
-        // --- bind Overview counters ---
         tvActiveSlots = findViewById(R.id.tvActiveSlots)
-        // NOTE: XML id is tvNotifications but label is "Empty Slots"
         tvEmptySlots = findViewById(R.id.tvNotifications)
         tvTotalSlots = findViewById(R.id.tvTotalSlots)
 
-        // --- init grid ---
         rv = findViewById(R.id.slotRecyclerView)
         rv.layoutManager = GridLayoutManager(this, 2)
         adapter = SlotAdapter(
@@ -62,7 +56,6 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         )
         rv.adapter = adapter
 
-        // --- bottom nav ---
         BottomNavbar.attach(
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
@@ -86,7 +79,6 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
             unselectedAlpha = 0.35f
         )
 
-        // --- presenter ---
         presenter = HomeDashboardPresenter(this)
         presenter.attach(this)
         presenter.load()
@@ -113,10 +105,10 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun openAddSlot() {
-        // Prefer a boolean guard; if you must keep nextSlotNumber(), treat <=0 as "no space"
         val canAdd = presenter.canAddMore()
         if (!canAdd) {
-            showError("Maximum of 12 slots reached.")
+            val cap = presenter.getMaxSlots()
+            showError("Maximum of $cap slots reached. You can change this in Manage Shelf.")
             return
         }
 
@@ -126,21 +118,18 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun openSlotDetail(slot: Slot) {
-        val siteId = AppConfig.siteId ?: "home001"   // or your real current site
+        val siteId = AppConfig.siteId ?: "home001"
 
         val intent = Intent(this, SlotDetailActivity::class.java).apply {
-            putExtra("slot_id", slot.id)    // e.g. "slot1"
-            putExtra("site_id", siteId)     // e.g. "home001"
+            putExtra("slot_id", slot.id)
+            putExtra("site_id", siteId)
         }
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-
-
     override fun showError(message: String) {
-        // TODO: Toast or Snackbar
-        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {

@@ -1,12 +1,11 @@
 package com.shoesense.shoesense.ManageShelf
 
+import android.app.Notification
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputFilter
 import android.view.View
 import android.widget.*
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,7 +14,9 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.shoesense.shoesense.Model.Slot
 import com.shoesense.shoesense.R
+import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.home.HomeDashboardActivity
+import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
 
 class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
@@ -73,8 +74,6 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
         navNotifications = findViewById(R.id.navNotifications)
         navSettings = findViewById(R.id.navSettings)
 
-        // --- List views REMOVED in layout, so nothing to bind for them ---
-
         // --- Events ---
         btnBack.setOnClickListener { finish() }
 
@@ -84,7 +83,11 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
 
         // Simple local toggle (store in your own prefs if desired)
         switchNotifyDefault.setOnCheckedChangeListener { _, isChecked ->
-            Toast.makeText(this, if (isChecked) "Notifications enabled" else "Notifications disabled", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                if (isChecked) "Notifications enabled" else "Notifications disabled",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         // Bottom nav taps (adjust these routes to your actual activities)
@@ -94,10 +97,14 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
             finish()
         }
         navHistory.setOnClickListener {
-            Toast.makeText(this, "Analytics (coming soon)", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, HistoryActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            finish()
         }
         navNotifications.setOnClickListener {
-            Toast.makeText(this, "Notifications (coming soon)", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, NotificationActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            finish()
         }
         navSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -138,19 +145,8 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    // No list to click; leave this for future use if you add a slot grid/list again
+    // This screen no longer does renaming; keep method to satisfy interface
     override fun openRenameDialog(slot: Slot) {
-        val input = EditText(this).apply {
-            setText(slot.name)
-            setSelection(text.length)
-            filters = arrayOf(InputFilter.LengthFilter(30))
-        }
-        AlertDialog.Builder(this)
-            .setTitle("Rename ${slot.id.ifBlank { slot.name }}")
-            .setView(input)
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Save") { _, _ ->
-                presenter.onRenameConfirmed(slot.id.ifBlank { slot.name }, input.text.toString())
-            }.show()
+        // no-op: renaming is handled elsewhere (e.g., Slot Detail screen)
     }
 }
