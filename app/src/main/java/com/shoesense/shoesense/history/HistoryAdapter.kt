@@ -110,7 +110,7 @@ class HistoryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             // Use slotName if available, else fallback to slotId
             val label = event.displaySlotLabel()
-            tvAction.text = "This $label was ${event.status}"
+            tvAction.text = "$label • ${event.status.capitalize()}"
 
             tvTime.text = timeStr
 

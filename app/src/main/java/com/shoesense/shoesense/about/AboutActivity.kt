@@ -7,7 +7,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.home.HomeDashboardActivity
+import com.shoesense.shoesense.notification.NotificationActivity
 // import com.shoesense.shoesense.analytics.AnalyticsActivity
 // import com.shoesense.shoesense.notifications.NotificationsActivity
 import com.shoesense.shoesense.settings.SettingsActivity
@@ -50,8 +52,14 @@ class AboutActivity : AppCompatActivity(), AboutView {
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
-                onHistory = { /* ... */ },
-                onNotifications = { /* ... */ },
+                onHistory = {startActivity(Intent(this, HistoryActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                },
+                onNotifications = { startActivity(Intent(this, NotificationActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                },
                 onSettings = {
                     startActivity(Intent(this, SettingsActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

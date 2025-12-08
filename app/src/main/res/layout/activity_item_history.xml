@@ -1,67 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
-    <ImageView
-        android:id="@+id/imgShoeIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/shoe"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp" />
-
-    <!-- Status pill (fixed column at far right) -->
-    <TextView
-        android:id="@+id/tvStatus"
-        android:layout_width="72dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="empty"
-        android:textColor="@android:color/white"
-        android:background="@drawable/status_empty_bg"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp" />
+        android:padding="16dp">
 
-    <!-- Time column (always just left of status) -->
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10:35 AM"
-        android:textColor="@android:color/black"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toStartOf="@id/tvStatus"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp" />
+        <!-- Icon with circular background -->
+        <View
+            android:id="@+id/iconBackground"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/circle_button_bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Main text fills remaining space -->
-    <TextView
-        android:id="@+id/tvAction"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="This slot1 was empty"
-        android:textColor="@android:color/black"
-        android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@id/imgShoeIcon"
-        app:layout_constraintEnd_toStartOf="@id/tvTime"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        <ImageView
+            android:id="@+id/imgShoeIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/shoe"
+            app:layout_constraintStart_toStartOf="@id/iconBackground"
+            app:layout_constraintEnd_toEndOf="@id/iconBackground"
+            app:layout_constraintTop_toTopOf="@id/iconBackground"
+            app:layout_constraintBottom_toBottomOf="@id/iconBackground"
+            android:contentDescription="Shoe icon" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Content section -->
+        <LinearLayout
+            android:id="@+id/contentSection"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            app:layout_constraintStart_toEndOf="@id/iconBackground"
+            app:layout_constraintEnd_toStartOf="@id/statusSection"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/tvAction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="This slot1 was empty"
+                android:textColor="#2C2C2C"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_time"
+                    android:layout_marginEnd="4dp"
+                    android:contentDescription="Time icon" />
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10:35 AM"
+                    android:textColor="#666666"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Status section (right side) -->
+        <LinearLayout
+            android:id="@+id/statusSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            android:layout_marginStart="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="80dp"
+                android:gravity="center"
+                android:text="Empty"
+                android:textColor="@android:color/white"
+                android:background="@drawable/status_empty_bg"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

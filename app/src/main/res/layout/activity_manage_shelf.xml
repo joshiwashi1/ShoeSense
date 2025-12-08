@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="#FFF7D1"
     tools:context=".ManageShelf.ManageShelfActivity">
 
     <!-- Top Bar (Manage Shelf) -->
@@ -19,7 +19,7 @@
         android:paddingEnd="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:background="@android:color/white"
+        android:background="#FFF7D1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -324,7 +324,9 @@
                             android:id="@+id/switchNotifyDefault"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true" />
+                            android:checked="true"
+                            app:thumbTint="@drawable/switch_thumb_tint"
+                            app:trackTint="@drawable/switch_track_tint" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

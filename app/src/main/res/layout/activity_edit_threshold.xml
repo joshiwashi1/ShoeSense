@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F6C623"
+    android:background="#FFF7D1"
     tools:context=".EditThreshold.EditThresholdActivity">
 
     <!-- Card with content -->

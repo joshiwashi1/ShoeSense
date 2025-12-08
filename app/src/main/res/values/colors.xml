@@ -18,4 +18,15 @@
     <color name="blueAccent">#2DA4FF</color>
     <color name="surfaceLight">#F3F4F6</color>
     <color name="black_70">#70111111</color>
+    <color name="bg_main">#FFF7E8</color>          <!-- softer yellow -->
+    <color name="bg_card">#FFFFFF</color>          <!-- white card -->
+    <color name="bg_panel">#FFF0C2</color>         <!-- light warm panel -->
+    <color name="accent_primary">#2563EB</color>   <!-- blue -->
+    <color name="accent_subtle">#FACC15</color>    <!-- soft gold -->
+    <color name="text_primary">#1F2933</color>     <!-- dark charcoal -->
+    <color name="text_secondary">#6B7280</color>   <!-- muted gray -->
+    <color name="nav_bg">#1E293B</color>           <!-- deep navy -->
+    <color name="nav_icon_inactive">#94A3B8</color>
+    <color name="nav_icon_active">#FACC15</color>
+
 </resources>

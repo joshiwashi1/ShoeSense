@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+    android:padding="24dp"
+    android:background="#FFF7D1"
     tools:context=".login.LoginActivity">
 
     <!-- Logo -->
     <ImageView
         android:id="@+id/shoeLogo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="105dp"
+        android:layout_height="105dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="80dp"
         android:src="@drawable/shoe_icon" />
@@ -29,32 +31,31 @@
         android:textColor="@color/black"
         android:layout_marginTop="10dp"/>
 
-    <!-- Username Label -->
+    <!-- Email Label -->
     <TextView
         android:id="@+id/username_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/appName"
         android:layout_marginTop="40dp"
-        android:text="Email:"
+        android:text="Email"
+        android:textStyle="bold"
         android:textSize="14sp"
-        android:textColor="@color/black"
-        android:fontFamily="sans-serif"/>
+        android:textColor="@color/black" />
 
-    <!-- Username Field -->
+    <!-- Email Field -->
     <EditText
         android:id="@+id/email_edit_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="46dp"
         android:layout_below="@id/username_label"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="6dp"
         android:hint="Enter your email"
         android:padding="12dp"
         android:background="@drawable/edittext_bg"
-        android:fontFamily="sans-serif"
+        android:inputType="textEmailAddress"
         android:textColor="@color/black"
-        android:textColorHint="@color/darker_gray"/>
-
+        android:textColorHint="@color/darker_gray" />
 
     <!-- Password Label -->
     <TextView
@@ -63,54 +64,61 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/email_edit_text"
         android:layout_marginTop="20dp"
-        android:text="Password:"
+        android:text="Password"
+        android:textStyle="bold"
         android:textSize="14sp"
-        android:textColor="@color/black"
-        android:fontFamily="sans-serif"/>
+        android:textColor="@color/black" />
 
-    <!-- Password Field -->
-    <EditText
-        android:id="@+id/password_edit_text"
+    <!-- Password Field with Toggler -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/password_label"
-        android:layout_marginTop="5dp"
-        android:hint="Enter your password"
-        android:padding="12dp"
-        android:background="@drawable/edittext_bg"
-        android:inputType="textPassword"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/black"
-        android:textColorHint="@color/darker_gray"/>
+        android:layout_marginTop="6dp"
+        android:background="@android:color/transparent"
+        app:endIconMode="password_toggle"
+        app:endIconTint="@color/darker_gray"
+        app:hintEnabled="false">   <!-- 👈 disables floating hint -->
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@drawable/edittext_bg"
+            android:hint="Enter your password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/darker_gray" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 
+    <!-- Sign In Button -->
     <!-- Forgot Password -->
     <TextView
         android:id="@+id/forgot_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/password_edit_text"
-        android:layout_marginTop="5dp"
+        android:layout_below="@id/passwordTextInputLayout"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentEnd="true"
         android:text="Forgot Password?"
         android:textColor="@android:color/holo_red_dark"
-        android:textSize="14sp"
-        android:layout_alignParentStart="true"
-        android:paddingStart="5dp"/>
+        android:textSize="14sp" />
 
-    <!-- Sign In Button -->
+
     <Button
         android:id="@+id/login_Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_below="@id/forgot_password"
         android:layout_marginTop="20dp"
         android:text="Sign in"
-        android:background="@drawable/button_bg"
-        android:textColor="@android:color/black"
-        android:fontFamily="sans-serif"
-        android:padding="12dp"/>
-
-
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/blue_button_bg"
+        android:textColor="@color/white" />
 
     <!-- Register Section -->
     <LinearLayout
@@ -126,16 +134,16 @@
             android:layout_height="wrap_content"
             android:text="No account yet? "
             android:textColor="@color/black"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/register_here"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Register here"
-            android:textColor="@android:color/holo_blue_dark"
             android:textStyle="bold"
-            android:textSize="14sp"/>
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="14sp" />
     </LinearLayout>
 
 </RelativeLayout>

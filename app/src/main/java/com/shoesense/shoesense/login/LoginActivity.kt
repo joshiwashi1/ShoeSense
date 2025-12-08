@@ -49,7 +49,6 @@ class LoginActivity : Activity(), LoginView {
         }
 
         registerText.setOnClickListener {
-            Toast.makeText(this, "Opening Register Page", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 

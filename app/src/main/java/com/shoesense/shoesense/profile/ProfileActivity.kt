@@ -2,7 +2,6 @@ package com.shoesense.shoesense.profile
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -25,19 +24,19 @@ class ProfileActivity : AppCompatActivity(), ProfileView.View {
     // Account Info placeholders (middle section)
     private lateinit var profileName: TextView
     private lateinit var profileEmail: TextView
-    private lateinit var sectionAccountInfo: View
 
     // Buttons
     private lateinit var btnBack: ImageView
-    private lateinit var btnAccountInfo: Button
     private lateinit var btnUpdateProfile: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide the AppCompat ActionBar (if your theme still shows one)
-        actionBar?.hide()
-        // Hide the STATUS BAR (not the nav bar)
+
+        // Hide the AppCompat ActionBar (if your theme shows one)
+        supportActionBar?.hide()
+        // Hide the STATUS BAR (full screen)
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
         setContentView(R.layout.activity_profile)
 
         // --- Bind views ---
@@ -47,10 +46,8 @@ class ProfileActivity : AppCompatActivity(), ProfileView.View {
 
         profileName = findViewById(R.id.profileName)
         profileEmail = findViewById(R.id.profileEmail)
-        sectionAccountInfo = findViewById(R.id.sectionAccountInfo)
 
         btnBack = findViewById(R.id.btnBack)
-        btnAccountInfo = findViewById(R.id.btnAccountInfo)
         btnUpdateProfile = findViewById(R.id.btnUpdateProfile)
 
         presenter = ProfilePresenter(this)
@@ -70,12 +67,12 @@ class ProfileActivity : AppCompatActivity(), ProfileView.View {
 
         if (displayName.isNotBlank()) {
             tvName.text = displayName
-            profileName.text = displayName        // fill placeholder too
+            profileName.text = displayName
         }
 
         if (email.isNotBlank()) {
             tvEmail.text = email
-            profileEmail.text = email            // fill placeholder too
+            profileEmail.text = email
         }
 
         if (!photoUrl.isNullOrBlank()) {
@@ -89,7 +86,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView.View {
             imgProfile.setImageResource(R.drawable.profile_icon)
         }
 
-        // --- Fetch richer profile (e.g., name override or custom photo) via Presenter ---
+        // --- Fetch richer profile via Presenter (override name/photo if stored in RTDB) ---
         if (email.isNotBlank()) {
             presenter.fetchUserProfile(email)
         } else {
@@ -99,15 +96,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView.View {
         // --- Button actions ---
         btnBack.setOnClickListener { finish() }
 
-        // Toggle the Account Info section for a simple expansion behavior
-        btnAccountInfo.setOnClickListener {
-            sectionAccountInfo.visibility =
-                if (sectionAccountInfo.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-        }
-
-        // Open your Edit Profile screen (if you have one), else simple toast for now
         btnUpdateProfile.setOnClickListener {
-            // ✅ Navigate to UpdateProfileActivity instead of showing a toast
             val intent = Intent(this, UpdateProfileActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -139,9 +128,11 @@ class ProfileActivity : AppCompatActivity(), ProfileView.View {
     }
 
     override fun showLoading(isLoading: Boolean) {
-        // Hook to a ProgressBar if you add one later
-        if (isLoading) {
-            // no-op or small toast/log
-        }
+        // Hook a ProgressBar here if you add one later
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.detach()
     }
 }

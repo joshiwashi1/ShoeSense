@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFF7D1"
     tools:context=".settings.SettingsActivity">
 
     <!-- Main content -->
@@ -238,10 +239,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:thumbTint="@color/white"
-                    android:trackTint="@color/blue_main"
                     android:switchMinWidth="60dp"
-                    android:switchPadding="4dp" />
+                    android:switchPadding="4dp"
+                    app:thumbTint="@drawable/switch_thumb_tint"
+                    app:trackTint="@drawable/switch_track_tint" />
             </LinearLayout>
 
             <View

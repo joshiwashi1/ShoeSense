@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="#FFF7D1"
     android:fillViewport="true"
     tools:context=".UpdateProfile.UpdateProfileActivity">
 
@@ -36,7 +36,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Profile Image -->
             <ImageView
                 android:id="@+id/imgProfile"
                 android:layout_width="match_parent"
@@ -47,7 +46,6 @@
                 android:src="@drawable/profile_icon"
                 android:contentDescription="Profile Image" />
 
-            <!-- Camera Icon Overlay -->
             <ImageView
                 android:id="@+id/btnChangeImage"
                 android:layout_width="36dp"
@@ -71,40 +69,11 @@
             android:paddingVertical="8dp"
             android:background="@drawable/textviewcolor_yellowbackgroundroundedcorners"
             android:fontFamily="sans-serif-medium"
-            android:text="Update Profile"
+            android:text="Edit Profile"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/profileImageContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Username Label -->
-        <TextView
-            android:id="@+id/username_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:fontFamily="sans-serif"
-            android:text="Username:"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <!-- Username Input -->
-        <EditText
-            android:id="@+id/username_edit_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/edittext_bg"
-            android:fontFamily="sans-serif"
-            android:hint="Enter your username"
-            android:padding="12dp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/darker_gray"
-            app:layout_constraintTop_toBottomOf="@id/username_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -113,12 +82,12 @@
             android:id="@+id/name_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="32dp"
             android:fontFamily="sans-serif"
             android:text="Name:"
             android:textColor="@color/black"
             android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/username_edit_text"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
             app:layout_constraintStart_toStartOf="parent" />
 
         <!-- Name Input -->
@@ -126,44 +95,14 @@
             android:id="@+id/name_edit_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="6dp"
             android:background="@drawable/edittext_bg"
             android:fontFamily="sans-serif"
-            android:hint="Enter your full name"
+            android:hint="Update your name"
             android:padding="12dp"
             android:textColor="@color/black"
             android:textColorHint="@color/darker_gray"
             app:layout_constraintTop_toBottomOf="@id/name_label"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Email Label -->
-        <TextView
-            android:id="@+id/email_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:fontFamily="sans-serif"
-            android:text="Email:"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/name_edit_text"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <!-- Email Input -->
-        <EditText
-            android:id="@+id/email_edit_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/edittext_bg"
-            android:fontFamily="sans-serif"
-            android:hint="Enter your email"
-            android:inputType="textEmailAddress"
-            android:padding="12dp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/darker_gray"
-            app:layout_constraintTop_toBottomOf="@id/email_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -178,7 +117,8 @@
             android:text="Save Changes"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/email_edit_text"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/name_edit_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

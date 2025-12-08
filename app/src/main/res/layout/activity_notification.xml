@@ -4,12 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFD100"
+    android:background="#FFF7D1"
     tools:context=".notification.NotificationActivity">
-
-    <!-- Title -->
-
-    <!-- Filter Buttons Row -->
 
     <TextView
         android:id="@+id/notificationTitle"
