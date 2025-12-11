@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Top row: title + time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvNotifTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Notification title"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvNotifTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10:32 AM"
+                android:textSize="11sp"
+                android:textColor="#999999" />
+        </LinearLayout>
+
+        <!-- Message / body -->
+        <TextView
+            android:id="@+id/tvNotifMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Notification body goes here with a short explanation."
+            android:textSize="13sp"
+            android:textColor="#555555"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <!-- Unread dot, aligned left under text -->
+        <View
+            android:id="@+id/dotUnread"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_unread_dot" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

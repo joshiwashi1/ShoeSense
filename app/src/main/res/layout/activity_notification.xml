@@ -7,68 +7,88 @@
     android:background="#FFF7D1"
     tools:context=".notification.NotificationActivity">
 
+    <!-- Top Title -->
     <TextView
         android:id="@+id/notificationTitle"
-        android:layout_width="152dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="130dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="130dp"
-        android:text="Notifications"
-        android:textColor="@color/black"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <LinearLayout
-        android:id="@+id/filterContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="Notifications"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- Filter Row -->
+    <LinearLayout
+        android:id="@+id/filterContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/notificationTitle"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btnAll"
-            android:layout_width="wrap_content"
+        <!-- Small filter group on the left -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="All"
-            android:textColor="@android:color/white"
-            android:backgroundTint="#2196F3"
-            android:minWidth="60dp"
-            android:paddingHorizontal="10dp"/>
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btnUnread"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unread"
-            android:textColor="@android:color/black"
-            android:backgroundTint="#FFEB3B"
-            android:layout_marginStart="8dp"
-            android:minWidth="80dp"
-            android:paddingHorizontal="10dp"/>
+            <Button
+                android:id="@+id/btnAll"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="All"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#2196F3"
+                android:minWidth="64dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp" />
 
+            <Button
+                android:id="@+id/btnUnread"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:text="Unread"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:backgroundTint="#FFEB3B"
+                android:minWidth="80dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp" />
+        </LinearLayout>
+
+        <!-- Action text on the right -->
         <TextView
             android:id="@+id/markAllRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mark All As Read"
+            android:text="Mark all as read"
             android:textColor="#2196F3"
+            android:textSize="13sp"
             android:textStyle="bold"
-            android:layout_marginStart="16dp"
-            android:gravity="center_vertical"/>
+            android:paddingStart="12dp"
+            android:paddingEnd="4dp"
+            android:gravity="center_vertical" />
     </LinearLayout>
 
+    <!-- Scrollable List of Notifications -->
     <!-- Scrollable List of Notifications -->
     <ScrollView
         android:id="@+id/scrollNotifications"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_above="@+id/bottomNavigation"
         android:layout_below="@id/filterContainer"
+        android:layout_above="@+id/bottomNavigation"
         android:layout_marginTop="12dp">
 
         <LinearLayout
@@ -76,7 +96,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp" />
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="20dp" />
+
     </ScrollView>
 
     <!-- 🌟 Custom Bottom Navigation Bar -->
@@ -155,5 +178,70 @@
                 android:contentDescription="Settings" />
         </LinearLayout>
     </LinearLayout>
+
+    <!-- Loading Overlay (unchanged) -->
+    <FrameLayout
+        android:id="@+id/loading_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardUseCompatPadding="true"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:id="@+id/loading_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/shoe_icon"
+                    app:tint="#FFD428"
+                    android:contentDescription="Loading" />
+
+                <TextView
+                    android:id="@+id/loading_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Loading your shelf…"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333" />
+
+                <TextView
+                    android:id="@+id/loading_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Please wait a moment 👟"
+                    android:textSize="13sp"
+                    android:textColor="#888888" />
+
+                <ProgressBar
+                    android:id="@+id/loading_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    style="?android:attr/progressBarStyleLarge" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
 
 </RelativeLayout>

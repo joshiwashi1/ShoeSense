@@ -2,12 +2,12 @@ package com.shoesense.shoesense.Repository
 
 import android.app.Activity
 import android.content.res.ColorStateList
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import com.shoesense.shoesense.R
+import com.shoesense.shoesense.Utils.LoadingScreenHelper   // 👈 import the helper
 
 object BottomNavbar {
 
@@ -23,7 +23,9 @@ object BottomNavbar {
     )
 
     /**
-     * Call this from your Activity after setContentView(...)
+     * Call this from your Activity after:
+     *   setContentView(...)
+     *   LoadingScreenHelper.init(this)
      */
     fun attach(
         activity: Activity,
@@ -31,7 +33,8 @@ object BottomNavbar {
         callbacks: Callbacks,
         @ColorInt selectedTint: Int? = null,
         @ColorInt unselectedTint: Int? = null,
-        unselectedAlpha: Float = 0.45f
+        unselectedAlpha: Float = 0.45f,
+        useLoadingOverlay: Boolean = true   // 👈 control loading from here
     ) {
         val navHome = activity.findViewById<LinearLayout>(R.id.navHome)
 
@@ -84,14 +87,30 @@ object BottomNavbar {
             }
         }
 
+        fun loadingMessageFor(item: Item): String =
+            when (item) {
+                Item.HOME -> "Loading your home shelf…"
+                Item.HISTORY -> "Loading shoe history…"
+                Item.NOTIFICATIONS -> "Fetching notifications…"
+                Item.SETTINGS -> "Opening settings…"
+            }
+
         fun onClick(item: Item) {
+            // 👟 Optional: show cute loader when user taps a tab
+            if (useLoadingOverlay) {
+                LoadingScreenHelper.showLoading(loadingMessageFor(item))
+            }
+
             applySelectedState(item)
+
             when (item) {
                 Item.HOME -> callbacks.onHome()
                 Item.HISTORY -> callbacks.onHistory()
                 Item.NOTIFICATIONS -> callbacks.onNotifications()
                 Item.SETTINGS -> callbacks.onSettings()
             }
+            // ⚠️ Do NOT hide here — let the screen that loads data call LoadingScreenHelper.hide()
+            // when Firebase / API / DB is finished.
         }
 
         // Hook listeners

@@ -15,6 +15,7 @@ import com.shoesense.shoesense.Model.SlotEvent
 import com.shoesense.shoesense.Model.SlotRepository
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.Utils.LoadingScreenHelper   // 👈 add this
 import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
@@ -31,6 +32,10 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
+
+        // ✅ Initialize loading helper for this Activity
+        LoadingScreenHelper.init(this)
+        LoadingScreenHelper.showLoading("Loading history…")
 
         // RecyclerView
         recyclerHistory = findViewById(R.id.recyclerHistory)
@@ -68,17 +73,20 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
             defaultSelected = BottomNavbar.Item.HISTORY,
             callbacks = BottomNavbar.Callbacks(
                 onHome = {
+                    LoadingScreenHelper.showLoading("Loading home…")
                     startActivity(Intent(this, HomeDashboardActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
                 onHistory = { /* already here */ },
                 onNotifications = {
+                    LoadingScreenHelper.showLoading("Opening notifications…")
                     startActivity(Intent(this, NotificationActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 },
                 onSettings = {
+                    LoadingScreenHelper.showLoading("Opening settings…")
                     startActivity(Intent(this, SettingsActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
@@ -91,6 +99,8 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
     // ==== HistoryView implementation ====
 
     override fun showEvents(events: List<SlotEvent>) {
+        // ✅ Data arrived → hide loader
+        LoadingScreenHelper.hide()
         adapter.submitList(events)
     }
 
@@ -105,6 +115,7 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
     }
 
     override fun showError(message: String) {
+        LoadingScreenHelper.hide()   // also hide on error
         Toast.makeText(this, "Error: $message", Toast.LENGTH_SHORT).show()
     }
 

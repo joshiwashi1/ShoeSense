@@ -14,6 +14,7 @@ import com.shoesense.shoesense.R
 import com.shoesense.shoesense.AddSlot.AddSlotActivity
 import com.shoesense.shoesense.Repository.AppConfig
 import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.Utils.LoadingScreenHelper     // 👈 ADD THIS
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
 import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.notification.NotificationActivity
@@ -34,6 +35,7 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         ActivityResultContracts.StartActivityForResult()
     ) { res ->
         if (res.resultCode == AddSlotActivity.RESULT_SAVED) {
+            LoadingScreenHelper.showLoading("Refreshing your shelf…")  // optional
             presenter.load()
         }
     }
@@ -44,6 +46,10 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_home_dashboard)
 
+        // ✅ Init loading helper for this activity
+        LoadingScreenHelper.init(this)
+        LoadingScreenHelper.showLoading("Loading your shelf…")
+
         tvActiveSlots = findViewById(R.id.tvActiveSlots)
         tvEmptySlots = findViewById(R.id.tvNotifications)
         tvTotalSlots = findViewById(R.id.tvTotalSlots)
@@ -51,8 +57,14 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
         rv = findViewById(R.id.slotRecyclerView)
         rv.layoutManager = GridLayoutManager(this, 2)
         adapter = SlotAdapter(
-            onAdd = { presenter.onAddClicked() },
-            onClick = { slot -> presenter.onSlotClicked(slot) }
+            onAdd = {
+                LoadingScreenHelper.showLoading("Opening add slot…")
+                presenter.onAddClicked()
+            },
+            onClick = { slot ->
+                LoadingScreenHelper.showLoading("Opening slot details…")
+                presenter.onSlotClicked(slot)
+            }
         )
         rv.adapter = adapter
 
@@ -60,23 +72,30 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
             activity = this,
             defaultSelected = BottomNavbar.Item.HOME,
             callbacks = BottomNavbar.Callbacks(
-                onHome = { rv.smoothScrollToPosition(0) },
+                onHome = {
+                    // Already on home — no need to show loader
+                    rv.smoothScrollToPosition(0)
+                },
                 onHistory = {
+                    LoadingScreenHelper.showLoading("Loading history…")
                     startActivity(Intent(this, HistoryActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 },
                 onNotifications = {
+                    LoadingScreenHelper.showLoading("Opening notifications…")
                     startActivity(Intent(this, NotificationActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 },
                 onSettings = {
+                    LoadingScreenHelper.showLoading("Opening settings…")
                     startActivity(Intent(this, SettingsActivity::class.java))
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 }
             ),
             selectedTint   = ContextCompat.getColor(this, android.R.color.white),
             unselectedTint = ContextCompat.getColor(this, android.R.color.white),
-            unselectedAlpha = 0.35f
+            unselectedAlpha = 0.35f,
+            useLoadingOverlay = false  // ⬅️ Let *this* activity control when to show loader
         )
 
         presenter = HomeDashboardPresenter(this)
@@ -92,6 +111,10 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     // --- HomeDashboardView ---
     override fun render(items: List<SlotRow>) {
         if (!::adapter.isInitialized) return
+
+        // ✅ Data finished loading → hide loader
+        LoadingScreenHelper.hide()
+
         adapter.submitList(items)
 
         val dataRows = items.filterIsInstance<SlotRow.Data>()
@@ -129,11 +152,13 @@ class HomeDashboardActivity : AppCompatActivity(), HomeDashboardView {
     }
 
     override fun showError(message: String) {
+        LoadingScreenHelper.hide()  // also hide on error
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
         super.onResume()
+        LoadingScreenHelper.hide()   // 👈 add this
         presenter.load()
     }
 }
