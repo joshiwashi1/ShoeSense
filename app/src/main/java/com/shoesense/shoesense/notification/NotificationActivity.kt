@@ -7,34 +7,38 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.shoesense.shoesense.R
-import com.shoesense.shoesense.Repository.BottomNavbar
 import com.shoesense.shoesense.Utils.LoadingScreenHelper
 import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.settings.SettingsActivity
+import com.shoesense.shoesense.utils.BottomNavbar
+
 
 class NotificationActivity : AppCompatActivity(), NotificationView {
 
     private lateinit var presenter: NotificationPresenter
     private lateinit var notificationList: LinearLayout
-    private var allMarkedRead: Boolean = false
+    private lateinit var readStore: ReadStateStore
+
+    private val currentIds = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        actionBar?.hide()
+
+        // ✅ AppCompatActivity uses supportActionBar
+        supportActionBar?.hide()
+
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_notification)
 
-        // ✅ init loading helper for this activity
         LoadingScreenHelper.init(this)
         LoadingScreenHelper.showLoading("Loading notifications…")
 
+        readStore = ReadStateStore(this)
         notificationList = findViewById(R.id.notificationList)
 
-        // "Mark all as read" click
-        val markAllReadView = findViewById<TextView>(R.id.markAllRead)
-        markAllReadView.setOnClickListener {
-            allMarkedRead = true
+        findViewById<TextView>(R.id.markAllRead).setOnClickListener {
+            readStore.markAllRead(currentIds)
             markAllCardsAsRead()
         }
 
@@ -58,7 +62,7 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
                     finish()
                 },
                 onNotifications = {
-                    // already here – no action
+                    // already here
                 },
                 onSettings = {
                     LoadingScreenHelper.showLoading("Opening settings…")
@@ -72,13 +76,12 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
         )
     }
 
-    override fun renderNotifications(notifications: List<String>) {
-        // data arrived → hide loader
+    override fun renderNotifications(items: List<NotificationItem>) {
         LoadingScreenHelper.hide()
-
         notificationList.removeAllViews()
+        currentIds.clear()
 
-        if (notifications.isEmpty()) {
+        if (items.isEmpty()) {
             val emptyView = TextView(this).apply {
                 text = "No notifications yet."
                 textSize = 14f
@@ -89,7 +92,9 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
             return
         }
 
-        for (msg in notifications) {
+        for (item in items) {
+            currentIds.add(item.id)
+
             val cardView = layoutInflater.inflate(
                 R.layout.item_notification_card,
                 notificationList,
@@ -101,37 +106,16 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
             val timeView = cardView.findViewById<TextView>(R.id.tvNotifTime)
             val unreadDot = cardView.findViewById<View>(R.id.dotUnread)
 
-            // Expecting format: "10:32 AM • Shoe detected in Slot A3"
-            val parts = msg.split("•", limit = 2)
-            if (parts.size == 2) {
-                val timePart = parts[0].trim()
-                val bodyPart = parts[1].trim()
+            titleView.text = item.title
+            messageView.text = item.message
+            timeView.text = item.time
 
-                timeView.text = timePart
-                messageView.text = bodyPart
+            unreadDot.visibility = if (item.isRead) View.GONE else View.VISIBLE
 
-                // 👉 Handle both "Shoe detected in X" and "Shoe removed from X"
-                val slotLabel = when {
-                    bodyPart.startsWith("Shoe detected in ") ->
-                        bodyPart.removePrefix("Shoe detected in ").trim()
-
-                    bodyPart.startsWith("Shoe removed from ") ->
-                        bodyPart.removePrefix("Shoe removed from ").trim()
-
-                    else ->
-                        bodyPart // fallback: just show full message as title
-                }
-
-                titleView.text = slotLabel
-            } else {
-                // fallback if string not in expected format
-                titleView.text = "Notification"
-                messageView.text = msg
-                timeView.text = ""
+            cardView.setOnClickListener {
+                readStore.markRead(item.id)
+                unreadDot.visibility = View.GONE
             }
-
-            // If already marked all read in this session, hide dot immediately
-            unreadDot.visibility = if (allMarkedRead) View.GONE else View.VISIBLE
 
             notificationList.addView(cardView)
         }
@@ -139,7 +123,6 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
 
     override fun showError(message: String) {
         LoadingScreenHelper.hide()
-
         notificationList.removeAllViews()
 
         val textView = TextView(this).apply {
@@ -152,11 +135,9 @@ class NotificationActivity : AppCompatActivity(), NotificationView {
     }
 
     private fun markAllCardsAsRead() {
-        val childCount = notificationList.childCount
-        for (i in 0 until childCount) {
+        for (i in 0 until notificationList.childCount) {
             val child = notificationList.getChildAt(i)
-            val dot = child.findViewById<View?>(R.id.dotUnread)
-            dot?.visibility = View.GONE
+            child.findViewById<View?>(R.id.dotUnread)?.visibility = View.GONE
         }
     }
 

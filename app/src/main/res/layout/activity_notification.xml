@@ -20,7 +20,7 @@
         android:textSize="22sp"
         android:textStyle="bold" />
 
-    <!-- Filter Row -->
+    <!-- Header Row (only action on the right now) -->
     <LinearLayout
         android:id="@+id/filterContainer"
         android:layout_width="match_parent"
@@ -32,42 +32,12 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!-- Small filter group on the left -->
-        <LinearLayout
+        <!-- spacer pushes the action text to the right -->
+        <View
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <Button
-                android:id="@+id/btnAll"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="All"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#2196F3"
-                android:minWidth="64dp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp" />
-
-            <Button
-                android:id="@+id/btnUnread"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginStart="8dp"
-                android:text="Unread"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                android:textColor="@android:color/black"
-                android:backgroundTint="#FFEB3B"
-                android:minWidth="80dp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp" />
-        </LinearLayout>
-
-        <!-- Action text on the right -->
         <TextView
             android:id="@+id/markAllRead"
             android:layout_width="wrap_content"
@@ -81,7 +51,6 @@
             android:gravity="center_vertical" />
     </LinearLayout>
 
-    <!-- Scrollable List of Notifications -->
     <!-- Scrollable List of Notifications -->
     <ScrollView
         android:id="@+id/scrollNotifications"
@@ -99,7 +68,6 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="20dp" />
-
     </ScrollView>
 
     <!-- 🌟 Custom Bottom Navigation Bar -->

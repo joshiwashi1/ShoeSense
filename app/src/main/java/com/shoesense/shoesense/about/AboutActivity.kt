@@ -6,7 +6,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.shoesense.shoesense.R
-import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.utils.BottomNavbar
 import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.notification.NotificationActivity

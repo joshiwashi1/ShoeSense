@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
     android:layout_marginTop="6dp"
     android:layout_marginBottom="6dp"
     app:cardCornerRadius="12dp"
-    app:cardUseCompatPadding="true"
     app:cardElevation="2dp"
     app:cardBackgroundColor="@android:color/white">
 
@@ -14,9 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
-        <!-- Top row: title + time -->
+        <!-- Header row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,41 +29,44 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Notification title"
-                android:textSize="14sp"
+                android:text="Slot A1"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#222222"
+                android:textColor="#1A1A1A"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:ellipsize="end"
+                android:layout_marginEnd="12dp" />
 
             <TextView
                 android:id="@+id/tvNotifTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10:32 AM"
-                android:textSize="11sp"
-                android:textColor="#999999" />
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Unread dot -->
+            <View
+                android:id="@+id/dotUnread"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_unread_dot" />
+
         </LinearLayout>
 
-        <!-- Message / body -->
+        <!-- Message -->
         <TextView
             android:id="@+id/tvNotifMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Notification body goes here with a short explanation."
-            android:textSize="13sp"
-            android:textColor="#555555"
+            android:layout_marginTop="8dp"
+            android:text="Shoe removed from Slot A1"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:lineSpacingExtra="2dp"
             android:maxLines="3"
             android:ellipsize="end" />
-
-        <!-- Unread dot, aligned left under text -->
-        <View
-            android:id="@+id/dotUnread"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_unread_dot" />
 
     </LinearLayout>
 

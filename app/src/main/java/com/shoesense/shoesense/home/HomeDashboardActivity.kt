@@ -13,7 +13,7 @@ import com.shoesense.shoesense.Model.Slot
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.AddSlot.AddSlotActivity
 import com.shoesense.shoesense.Repository.AppConfig
-import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.utils.BottomNavbar
 import com.shoesense.shoesense.Utils.LoadingScreenHelper     // 👈 ADD THIS
 import com.shoesense.shoesense.SlotDetail.SlotDetailActivity
 import com.shoesense.shoesense.history.HistoryActivity

@@ -1,12 +1,14 @@
 package com.shoesense.shoesense.ChangePassword
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import com.shoesense.shoesense.R
+import com.shoesense.shoesense.settings.SettingsActivity
 
 class ChangePasswordActivity : Activity(), ChangePasswordView.View {
 
@@ -49,7 +51,11 @@ class ChangePasswordActivity : Activity(), ChangePasswordView.View {
 
     override fun showSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        // Optionally close after success
-        // finish()
+
+        // Navigate back to Settings screen
+        val intent = Intent(this, SettingsActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
     }
 }

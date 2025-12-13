@@ -14,7 +14,7 @@ import com.shoesense.shoesense.Model.HistoryRepository
 import com.shoesense.shoesense.Model.SlotEvent
 import com.shoesense.shoesense.Model.SlotRepository
 import com.shoesense.shoesense.R
-import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.utils.BottomNavbar
 import com.shoesense.shoesense.Utils.LoadingScreenHelper   // 👈 add this
 import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.notification.NotificationActivity
@@ -31,6 +31,7 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_history)
 
         // ✅ Initialize loading helper for this Activity

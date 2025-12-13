@@ -21,9 +21,10 @@ class NotificationPresenter(private val ctx: Context) {
     private var view: NotificationView? = null
     private var observing = false
 
-    // remember which events we've already handled
-    private val seenEventIds = mutableSetOf<String>()
+    private val readStore = ReadStateStore(ctx)
 
+    // Push control (prevents “spam on restart”)
+    private val pushPrefs = ctx.getSharedPreferences("notif_push_state", Context.MODE_PRIVATE)
     private val channelId = "shoesense_events"
 
     fun attach(v: NotificationView) {
@@ -41,21 +42,24 @@ class NotificationPresenter(private val ctx: Context) {
     private fun observeHistory() {
         observing = true
         historyRepo.observeHistory(
-            slotId = null,   // all slots
+            slotId = null,
             onUpdate = { events ->
-                // update in-app list
-                val texts = buildNotifications(events)
-                view?.renderNotifications(texts)
+                // Newest first for UI
+                val sorted = events.sortedByDescending { it.lastUpdated }
 
-                // show push for any NEW events
-                handleNewEventsForPush(events)
+                // Build UI models (includes persistent read state)
+                val items = buildNotificationItems(sorted)
+                view?.renderNotifications(items)
+
+                // Push only for truly new events
+                handleNewEventsForPush(sorted)
             },
             onError = { msg -> view?.showError(msg) }
         )
     }
 
-    // ====== build text list for NotificationActivity ======
-    private fun buildNotifications(events: List<SlotEvent>): List<String> {
+    // ====== UI MODEL BUILD ======
+    private fun buildNotificationItems(events: List<SlotEvent>): List<NotificationItem> {
         val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }
@@ -63,6 +67,7 @@ class NotificationPresenter(private val ctx: Context) {
 
         return events.map { ev ->
             val label = if (ev.slotName.isNotBlank()) ev.slotName else ev.slotId
+
             val timeStr = try {
                 val d = isoFormat.parse(ev.lastUpdated)
                 if (d != null) timeFormat.format(d) else "-"
@@ -70,35 +75,45 @@ class NotificationPresenter(private val ctx: Context) {
                 "-"
             }
 
-            // ✨ NEW wording
             val message = when (ev.status.lowercase()) {
-                "occupied" -> "Shoe detected in $label"
-                "empty" -> "Shoe removed from $label"
-                else -> "$label status updated"
+                "occupied" -> "Shoe detected"
+                "empty" -> "Shoe removed"
+                else -> "Status updated"
             }
 
-            // This is what NotificationActivity receives:
-            // "10:44 AM • Shoe detected in slot2"
-            "$timeStr • $message"
+            NotificationItem(
+                id = ev.id,
+                time = timeStr,
+                title = label,              // Slot label as title (clean cards)
+                message = "$message in $label",
+                isRead = readStore.isRead(ev.id)
+            )
         }
     }
 
     // ====== PUSH NOTIFICATIONS (LOCAL) ======
     private fun handleNewEventsForPush(events: List<SlotEvent>) {
-        // oldest -> newest so notifications are in order
-        val ordered = events.sortedBy { it.lastUpdated }
+        val lastNotified = pushPrefs.getString("last_notified", "") ?: ""
 
-        for (ev in ordered) {
-            // only act on events we haven't seen before
-            if (!seenEventIds.add(ev.id)) continue
+        // oldest -> newest, and only newer than lastNotified
+        val newEvents = events
+            .sortedBy { it.lastUpdated }
+            .filter { it.lastUpdated > lastNotified }
+
+        for (ev in newEvents) {
             showLocalNotification(ev)
+        }
+
+        if (newEvents.isNotEmpty()) {
+            pushPrefs.edit()
+                .putString("last_notified", newEvents.last().lastUpdated)
+                .apply()
         }
     }
 
     private fun showLocalNotification(ev: SlotEvent) {
         val label = if (ev.slotName.isNotBlank()) ev.slotName else ev.slotId
 
-        // ✨ same wording as in-app notifications
         val message = when (ev.status.lowercase()) {
             "occupied" -> "Shoe detected in $label"
             "empty" -> "Shoe removed from $label"
@@ -107,10 +122,11 @@ class NotificationPresenter(private val ctx: Context) {
 
         val title = "ShoeSense"
 
-        // tap notification → open NotificationActivity
         val intent = Intent(ctx, NotificationActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("from_push", true)
         }
+
         val pendingIntent = PendingIntent.getActivity(
             ctx,
             0,
@@ -121,7 +137,7 @@ class NotificationPresenter(private val ctx: Context) {
         )
 
         val builder = NotificationCompat.Builder(ctx, channelId)
-            .setSmallIcon(R.drawable.notif_icon)  // or your shoe icon
+            .setSmallIcon(R.drawable.notif_icon)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
@@ -129,9 +145,7 @@ class NotificationPresenter(private val ctx: Context) {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
-        with(NotificationManagerCompat.from(ctx)) {
-            notify(ev.id.hashCode(), builder.build())
-        }
+        NotificationManagerCompat.from(ctx).notify(ev.id.hashCode(), builder.build())
     }
 
     private fun createNotificationChannel() {
@@ -142,7 +156,7 @@ class NotificationPresenter(private val ctx: Context) {
             val channel = NotificationChannel(channelId, name, importance).apply {
                 description = descriptionText
             }
-            val notificationManager: NotificationManager =
+            val notificationManager =
                 ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }

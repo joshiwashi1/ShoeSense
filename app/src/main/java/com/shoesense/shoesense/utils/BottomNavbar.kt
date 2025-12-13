@@ -1,4 +1,4 @@
-package com.shoesense.shoesense.Repository
+package com.shoesense.shoesense.utils
 
 import android.app.Activity
 import android.content.res.ColorStateList
@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import com.shoesense.shoesense.R
-import com.shoesense.shoesense.Utils.LoadingScreenHelper   // 👈 import the helper
+import com.shoesense.shoesense.Utils.LoadingScreenHelper
 
 object BottomNavbar {
 

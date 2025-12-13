@@ -11,7 +11,7 @@ import com.shoesense.shoesense.ChangePassword.ChangePasswordActivity
 import com.shoesense.shoesense.ManageShelf.ManageShelfActivity
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.Repository.AuthRepository
-import com.shoesense.shoesense.Repository.BottomNavbar
+import com.shoesense.shoesense.utils.BottomNavbar
 import com.shoesense.shoesense.about.AboutActivity
 import com.shoesense.shoesense.history.HistoryActivity
 import com.shoesense.shoesense.notification.NotificationActivity

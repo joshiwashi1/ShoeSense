@@ -34,16 +34,6 @@
                 android:textColor="#2C2C2C"
                 android:letterSpacing="0.02" />
         </LinearLayout>
-
-        <!-- Subtitle -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View your slot records"
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:layout_gravity="center"
-            android:layout_marginTop="4dp" />
     </LinearLayout>
 
     <!-- Filter Section Card -->
