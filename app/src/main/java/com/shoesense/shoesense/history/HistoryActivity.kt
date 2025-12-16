@@ -15,7 +15,7 @@ import com.shoesense.shoesense.Model.SlotEvent
 import com.shoesense.shoesense.Model.SlotRepository
 import com.shoesense.shoesense.R
 import com.shoesense.shoesense.utils.BottomNavbar
-import com.shoesense.shoesense.Utils.LoadingScreenHelper   // 👈 add this
+import com.shoesense.shoesense.Utils.LoadingScreenHelper
 import com.shoesense.shoesense.home.HomeDashboardActivity
 import com.shoesense.shoesense.notification.NotificationActivity
 import com.shoesense.shoesense.settings.SettingsActivity
@@ -113,6 +113,10 @@ class HistoryActivity : AppCompatActivity(), HistoryView {
         )
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spnSlotFilter.adapter = spinnerAdapter
+    }
+
+    override fun updateSlotNameMap(map: Map<String, String>) {
+        adapter.updateSlotNames(map)
     }
 
     override fun showError(message: String) {

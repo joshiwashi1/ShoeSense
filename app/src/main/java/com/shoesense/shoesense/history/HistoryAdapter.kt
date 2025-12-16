@@ -24,9 +24,21 @@ class HistoryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val items = mutableListOf<HistoryItem>()
 
+    // ✅ latest slot names (slotId -> slotName)
+    private var slotNameMap: Map<String, String> = emptyMap()
+
     companion object {
         private const val TYPE_DATE_HEADER = 0
         private const val TYPE_EVENT_ROW = 1
+    }
+
+    /**
+     * ✅ Call this whenever slot names change (rename)
+     * Example: adapter.updateSlotNames(map)
+     */
+    fun updateSlotNames(map: Map<String, String>) {
+        slotNameMap = map
+        notifyDataSetChanged() // refresh visible rows with latest names
     }
 
     // Public API – called from HistoryActivity
@@ -77,7 +89,7 @@ class HistoryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
             is HistoryItem.DateHeader -> (holder as DateHeaderVH).bind(item)
-            is HistoryItem.EventRow -> (holder as EventVH).bind(item.event)
+            is HistoryItem.EventRow -> (holder as EventVH).bind(item.event, slotNameMap)
         }
     }
 
@@ -105,13 +117,17 @@ class HistoryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
         private val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
-        fun bind(event: SlotEvent) {
+        fun bind(event: SlotEvent, slotNameMap: Map<String, String>) {
             val timeStr = parseTime(event.lastUpdated)
 
-            // Use slotName if available, else fallback to slotId
-            val label = event.displaySlotLabel()
-            tvAction.text = "$label • ${event.status.capitalize()}"
+            // ✅ Always show latest slot name if available
+            val latestName = slotNameMap[event.slotId]
+            val label = when {
+                !latestName.isNullOrBlank() -> latestName
+                else -> event.displaySlotLabel() // fallback (old saved name or slotId)
+            }
 
+            tvAction.text = "$label • ${event.status.replaceFirstChar { it.uppercase() }}"
             tvTime.text = timeStr
 
             tvStatus.text = event.status
@@ -124,7 +140,6 @@ class HistoryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             imgShoe.setImageResource(R.drawable.shoe)
         }
-
 
         private fun parseTime(iso: String): String {
             return try {

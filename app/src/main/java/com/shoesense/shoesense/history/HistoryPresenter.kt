@@ -19,14 +19,20 @@ class HistoryPresenter(
             onUpdate = { slots ->
                 allSlots = slots
 
-                // Build dropdown options: "All slots" + slot display names
+                // ✅ 1) Send latest slotId -> slotName map to adapter (for rename updates)
+                val slotNameMap: Map<String, String> = slots.associate { slot ->
+                    slot.id to slot.getDisplayName()   // latest name
+                }
+                view.updateSlotNameMap(slotNameMap)
+
+                // ✅ 2) Update dropdown options: "All slots" + slot display names
                 val options = mutableListOf<String>()
                 options.add("All slots")
                 options.addAll(slots.map { it.getDisplayName() })
                 view.showSlotFilterOptions(options)
 
-                // Start by showing ALL slots history
-                observeHistory(null)
+                // ✅ 3) Observe history based on CURRENT selection (don’t reset to all)
+                observeHistory(selectedSlotId)
             },
             onError = { msg ->
                 view.showError(msg)
@@ -40,25 +46,20 @@ class HistoryPresenter(
      * 1..n = specific slot at (index - 1) in allSlots
      */
     fun onFilterSelectedPosition(position: Int) {
-        selectedSlotId = if (position == 0) {
-            null
-        } else {
-            allSlots.getOrNull(position - 1)?.id
-        }
+        selectedSlotId = if (position == 0) null else allSlots.getOrNull(position - 1)?.id
         observeHistory(selectedSlotId)
     }
 
     private fun observeHistory(slotId: String?) {
+        historyRepo.stop()
+
         historyRepo.observeHistory(
             slotId = slotId,
-            onUpdate = { events ->
-                view.showEvents(events)
-            },
-            onError = { msg ->
-                view.showError(msg)
-            }
+            onUpdate = { events -> view.showEvents(events) },
+            onError = { msg -> view.showError(msg) }
         )
     }
+
 
     fun detach() {
         slotRepo.stopObserving()

@@ -33,12 +33,13 @@
             android:textColor="@color/black" />
 
         <!-- Settings Card (non-scrollable) -->
+        <!-- Settings Card (COMPACT – fits smaller screens) -->
         <LinearLayout
             android:id="@+id/settingsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="24dp"
+            android:layout_marginTop="12dp"
+            android:padding="16dp"
             android:orientation="vertical"
             android:background="@drawable/roundedlayout"
             android:backgroundTint="#FFFFFF">
@@ -52,36 +53,34 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/myaccount_logo"
-                    android:contentDescription="My Account" />
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/myaccount_logo" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="My Account"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginStart="12dp" />
+                    android:layout_marginStart="10dp" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_navigate"
-                    android:contentDescription="Navigate" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_navigate" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="12dp"
+                android:layout_marginVertical="8dp"
                 android:background="#E0E0E0" />
 
             <!-- Change Password -->
@@ -93,36 +92,34 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/changepasswordlogo"
-                    android:contentDescription="Change Password" />
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/changepasswordlogo" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Change Password"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginStart="12dp" />
+                    android:layout_marginStart="10dp" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_navigate"
-                    android:contentDescription="Navigate" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_navigate" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="12dp"
+                android:layout_marginVertical="8dp"
                 android:background="#E0E0E0" />
 
             <!-- Manage Shelf -->
@@ -134,39 +131,37 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/manageshelflogo"
-                    android:contentDescription="Manage Shelf" />
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/manageshelflogo" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Manage Shelf"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginStart="12dp" />
+                    android:layout_marginStart="10dp" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_navigate"
-                    android:contentDescription="Navigate" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_navigate" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="12dp"
+                android:layout_marginVertical="8dp"
                 android:background="#E0E0E0" />
 
-            <!-- Help -->
+            <!-- About -->
             <LinearLayout
                 android:id="@+id/aboutLayout"
                 android:layout_width="match_parent"
@@ -175,36 +170,34 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/helplogo"
-                    android:contentDescription="Help" />
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/helplogo" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="About"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginStart="12dp" />
+                    android:layout_marginStart="10dp" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_navigate"
-                    android:contentDescription="Navigate" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_navigate" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="12dp"
+                android:layout_marginVertical="8dp"
                 android:background="#E0E0E0" />
 
             <!-- Notifications -->
@@ -216,40 +209,36 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/notificationlogo"
-                    android:contentDescription="Notifications" />
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/notificationlogo" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Notifications"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginStart="12dp" />
+                    android:layout_marginStart="10dp" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchNotifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:switchMinWidth="60dp"
-                    android:switchPadding="4dp"
-                    app:thumbTint="@drawable/switch_thumb_tint"
-                    app:trackTint="@drawable/switch_track_tint" />
+                    android:switchMinWidth="48dp" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="12dp"
+                android:layout_marginVertical="8dp"
                 android:background="#E0E0E0" />
 
             <!-- Sign Out -->
@@ -261,25 +250,26 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/signoutlogo"
-                    android:contentDescription="Sign Out" />
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/signoutlogo" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sign out"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="#D32F2F"
-                    android:layout_marginStart="12dp" />
+                    android:layout_marginStart="10dp" />
             </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
 
     <!-- Bottom Navigation -->

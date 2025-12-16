@@ -45,7 +45,7 @@ class ManageShelfActivity : AppCompatActivity(), ManageShelfView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_manage_shelf)
 
         // Safe insets
